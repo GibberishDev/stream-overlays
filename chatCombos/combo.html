@@ -95,7 +95,7 @@
         }
     </script>
 </head>
-<body style="overflow: hidden; margin: 0;">
+<body style="overflow: hidden; margin: 0; background: black;">
     <style>
         
     @import url('https://fonts.cdnfonts.com/css/boldpixels');
@@ -261,6 +261,37 @@
 <script defer>
     const stack = document.querySelector(".combo-stack")
     const wrapper = document.querySelector("wrapper")
+    const wordsBlacklist = [
+        "the",
+        "or",
+        "a",
+        "an",
+        "to",
+        "of",
+        "and",
+        "in",
+        "i",
+        "i'm",
+        "im",
+        "it",
+        "for",
+        "on",
+        "you",
+        "do",
+        "they",
+        "from",
+        "we",
+        "she",
+        "her",
+        "he",
+        "his",
+        "him",
+        "be",
+        "them",
+        "is",
+        "are",
+        "", /*empty string*/
+        ]
 
     var settings = {
         timeoutRegular : 10000,
@@ -289,7 +320,7 @@
             if (!getEmoteImageUrl(word)) {
                 word = word.toLowerCase()
             }
-            if (word == "" || word == "͏") continue
+            if (wordsBlacklist.includes(word)) continue
             if (comboWords[word] == undefined) {
                 comboWords[word] = {
                     "timestamp" : new Date().getTime(),
