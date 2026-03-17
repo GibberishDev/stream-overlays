@@ -1,0 +1,158 @@
+
+    
+@import url('https://fonts.cdnfonts.com/css/boldpixels');
+* {
+    -webkit-font-smooting: none;
+}
+.wrapper {
+    display: flex;
+    flex-direction: row;
+    position : absolute;
+    margin: 8px;
+    width : calc(100dvw - 16px);
+    height : calc(100dvh - 16px);
+    overflow: hidden;
+}
+.combo-stack {
+    position: relative;
+    display: flex;
+    flex-direction: column-reverse;
+}
+.entry {
+    height: 24px;
+    color: yellow;
+    font-family: boldpixels;
+    font-size: 24px;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    animation: appear .5s 0s cubic-bezier(0.73, 1.68, 0.5, 0.99) 1 forwards;
+    transform-origin: 0 50%;
+}
+.entry.disappear {
+    animation: disappear .5s 0s cubic-bezier(0.73, 1.68, 0.5, 0.99) 1 forwards;
+}
+.timer {
+    --duration: 10000ms;
+    background-image: conic-gradient(transparent, var(--time-left), var(--timer-color), var(--time-left), var(--timer-color));
+    height: 16px;
+    margin-top: 4px;
+    aspect-ratio: 1;
+    border-radius: 100%;
+    animation: timer var(--duration) 0s linear 1 forwards;
+    transition-duration: 200ms;
+}
+.word {
+    display: flex;
+    flex-direction: row;
+    margin-right: 8px;
+}
+.letter {
+    line-height: 24px;
+    height: 24px;
+    width: min-content;
+}
+.shake .letter{
+    animation: shake linear .2s infinite, color-shift-fire 1s linear infinite forwards;
+}
+.wave .letter{
+    animation: wave ease-in-out .5s infinite, color-shift-rainbow 1s linear infinite forwards;
+}
+.entry:has(.shake) .counter{
+    animation: shake linear .2s infinite, color-shift-fire 1s linear infinite forwards;
+}
+.entry:has(.wave) .counter{
+    animation: wave ease-in-out .5s infinite, color-shift-rainbow 1s linear infinite forwards;
+}
+.counter {
+    text-align: right;
+    flex-grow: 1;
+    line-height: 24px;
+    animation: bump .2s 0s ease-out 1 forwards;
+}
+#notification {
+    color: yellow;
+    font-family: boldpixels;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    font-size: 12px;
+    line-height: 16px;
+}
+/* #region animations */
+@keyframes appear {
+    0% {transform: scale(0);}
+    100% {transform: scale(1);}
+}
+@keyframes disappear {
+    0% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(10dvh);
+    }
+}
+@keyframes bump {
+    0% {transform: translateX(0px);}
+    50% {transform: translateX(10px);}
+    100% {transform: translateX(0px);}
+}
+@keyframes shake {
+    0% { transform: translate(0, -1px) }
+    25% { transform: translate(-1px, 1px) }
+    50% { transform: translate(1px, 0px) }
+    75% { transform: translate(-1px, 1px) }
+    100% { transform: translate(0, -1px) }
+}
+@keyframes wave {
+    0% { transform: translateY(0px) }
+    50% { transform: translateY(2px) }
+    100% { transform: translateY(0px) }
+}
+@keyframes color-shift-rainbow {
+    0%   { color: hsl(0, 100%, 50%); }
+    20%  { color: hsl(72, 100%, 50%); }
+    40%  { color: hsl(144, 100%, 50%); }
+    60%  { color: hsl(216, 100%, 50%); }
+    80%  { color: hsl(288, 100%, 50%); }
+    100%  { color: hsl(360, 100%, 50%); }
+}
+@keyframes color-shift-fire {
+    0%   { color: hsl(0, 100%, 18%); }
+    10%  { color: hsl(32, 100%, 50%); }
+    20%  { color: hsl(39, 90%, 81%); }
+    30%  { color: hsl(27, 90%, 48%); }
+    40%  { color: hsl(27, 100%, 52%); }
+    50%  { color: hsl(0, 94%, 27%); }
+    60%   { color: hsl(0, 100%, 50%); }
+    70%  { color: hsl(39, 100%, 50%); }
+    80%  { color: hsl(27, 100%, 68%); }
+    90%  { color: hsl(27, 90%, 48%); }
+    100%  { color: hsl(0, 100%, 18%); }
+}
+@keyframes timer {
+    0% {
+        --time-left: 0deg;
+        --timer-color: rgba(255,255,255,0.5);
+    }
+    50% {
+        --timer-color: rgba(255, 123, 0, 0.705);
+    }
+    100% {
+        --time-left: 360deg;
+        --timer-color: rgba(255,0,0,0.8);
+    }
+}
+@property --time-left {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+@property --timer-color {
+    syntax: '<color>';
+    initial-value: rgba(255,255,255,0.5);
+    inherits: false;
+}
+/* #endregion */
