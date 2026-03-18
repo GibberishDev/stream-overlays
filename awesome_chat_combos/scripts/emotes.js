@@ -1,13 +1,11 @@
-import {moduleReady} from "./ready.js"
-
-export let bttvEmoteCodeToId = new Map()
-export let ffzEmoteCodeToId = new Map()
-export let seventvEmoteCodeToId = new Map()
-export let twitchGlobalEmoteCodeToId = new Map()
-export let twitchChannelEmoteCodeToId = new Map()
+let bttvEmoteCodeToId = new Map()
+let ffzEmoteCodeToId = new Map()
+let seventvEmoteCodeToId = new Map()
+let twitchGlobalEmoteCodeToId = new Map()
+let twitchChannelEmoteCodeToId = new Map()
 
 // Uses teklynk's https://github.com/teklynk/twitch_api_public
-export async function fetchEmotes(channels) {
+async function fetchEmotes(channels) {
     let response = await fetch("https://twitchapi.teklynk.com/getglobalemotes.php")
     var emotes = (await response.json())["data"]
     twitchGlobalEmoteCodeToId = new Map(emotes.map(emote => [emote["name"], emote["id"]]))
@@ -51,10 +49,10 @@ export async function fetchEmotes(channels) {
             }
         }
     }
-    moduleReady("emotes")
+    if (typeof moduleReady === 'function') moduleReady("emotes")
 }
 
-export function getEmoteImageUrl(word) {
+function getEmoteImageUrl(word) {
     let id = twitchGlobalEmoteCodeToId.get(word)
     if (id) return `https://static-cdn.jtvnw.net/emoticons/v2/${id}/default/dark/3.0`
     id = twitchChannelEmoteCodeToId.get(word)

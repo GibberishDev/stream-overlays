@@ -1,5 +1,6 @@
-import { moduleReady, setModuleList } from "../../core/ready.js"
-import { fetchEmotes, getEmoteImageUrl, bttvEmoteCodeToId, ffzEmoteCodeToId, seventvEmoteCodeToId, twitchChannelEmoteCodeToId, twitchGlobalEmoteCodeToId } from "../../core/emotes.js"
+import { fetchEmotes, getEmoteImageUrl, bttvEmoteCodeToId, ffzEmoteCodeToId, seventvEmoteCodeToId, twitchChannelEmoteCodeToId, twitchGlobalEmoteCodeToId } from "../core/scripts/emotes.js"
+import { moduleReady, setModuleList } from "../core/scripts/ready.js"
+import { Setting, SETTING_TYPE, SettingArray, SettingInt } from "../core/scripts/settings.js"
 
 const stack = document.querySelector(".combo-stack")
 const wrapper = document.querySelector("wrapper")
@@ -294,21 +295,20 @@ function getOptions() {
 }
 
 getOptions()
-fetchEmotes(["replacehim","j_shiba"])
 
-document.addEventListener("emotesReady", () => {
-    document.querySelector("#notification").innerHTML = "<div class=''>Loaded emotes from channel " + settings.channel.toUpperCase() + ":</div>"
-    document.querySelector("#notification").innerHTML += "<div class=''>Twitch native - " + (twitchEmoteCodeToId.size - twitchChannelEmoteCodeToId.size)  + "</div>"
+document.addEventListener("allmodulesready", () => {
+    document.querySelector("#notification").innerHTML = "<div class=''>Loaded emotes:</div>"
+    document.querySelector("#notification").innerHTML += "<div class=''>Twitch native - " + (twitchGlobalEmoteCodeToId.size)  + "</div>"
     document.querySelector("#notification").innerHTML += "<div class=''>Twitch channel - " + (twitchChannelEmoteCodeToId.size)  + "</div>"
     document.querySelector("#notification").innerHTML += "<div class=''>7TV - " + (seventvEmoteCodeToId.size)  + "</div>"
     document.querySelector("#notification").innerHTML += "<div class=''>FFZ - " + (ffzEmoteCodeToId.size)  + "</div>"
     document.querySelector("#notification").innerHTML += "<div class=''>BTTV - " + (bttvEmoteCodeToId.size)  + "</div>"
-    document.querySelector("#notification").innerHTML += "<div class=''>Total - " + (bttvEmoteCodeToId.size + ffzEmoteCodeToId.size + seventvEmoteCodeToId.size + twitchEmoteCodeToId.size)  + "</div>"
+    document.querySelector("#notification").innerHTML += "<div class=''>Total - " + (bttvEmoteCodeToId.size + ffzEmoteCodeToId.size + seventvEmoteCodeToId.size + twitchGlobalEmoteCodeToId.size + twitchChannelEmoteCodeToId.size)  + "</div>"
     document.querySelector("#notification").innerHTML += "<div class=''></div>"
     document.querySelector("#notification").innerHTML += "<div class=''>Awesome chat combos v1.0 by Gibbdev 2026</div>"
     setTimeout(()=>{document.querySelector("#notification").innerHTML = ""}, 5000)
     let cl = new tmi.Client({
-        channels: [settings.channel],
+        channels: ["j_shiba"],
         connection: {reconnect: true},
         skipMembership: true,
         skipUpdatingEmotesets: true,
@@ -324,4 +324,14 @@ function reorder() {
 
 let modules = ["settings","emotes"]
 setModuleList(modules)
-document.addEventListener("allmodulesready",(_event)=>{})
+fetchEmotes(["j_shiba"])
+moduleReady("settings")
+
+
+// #region init
+// #region settings
+new SettingArray("channels", [], "Channels", "List of channels to track for combo messages")
+new SettingInt("numberNormal")
+// #endregion
+
+// #endregion

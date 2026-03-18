@@ -2,20 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script defer src="../core/tmi.js"></script>
-    <script defer src="../core/ready.js" type="module"></script>
-    <!-- Translation of chatbuzz emote fetch algorythm from https://github.com/mattyHerzig/ChatBuzz/blob/main/src/emotes.ts by https://github.com/mattyHerzig -->
-    <script defer src="../core/emotes.js" type="module"></script>
-    <script defer src="./scripts/main.js" type="module"></script>
+    <link rel="icon" href="#">
+
+    <script src="../core/scripts/tmi.js"></script>
+
 
     <link rel="stylesheet" href="./styles/main.css">
-    <link rel="icon" href="#">
 </head>
-<body style="overflow: hidden; margin: 0; background: black;">
+<body style="overflow: hidden; margin: 0; background: black;color:white;">
 <div id="notification"></div>
 <div class="wrapper">
     <div class="combo-stack">
     </div>
 </div>
 </body>
+<script type="module" src="../core/scripts/emotes.js"></script>
+<script type="module" src="../core/scripts/ready.js"></script>
+<script type="module" src="./main.js"></script>
 </html>

@@ -1,7 +1,7 @@
 var moduleStates = new Map()
 var readyCount = 0
 
-export function moduleReady(moduleID) {
+function moduleReady(moduleID) {
     let ev = new Event("moduleready")
     ev.module = moduleID
     document.dispatchEvent(ev)
@@ -18,7 +18,7 @@ export function moduleReady(moduleID) {
     checkModules()
 }
 
-export function setModuleList(moduleList) {
+function setModuleList(moduleList) {
     for (let module of moduleList) {
         moduleStates.set(module, false)
     }
