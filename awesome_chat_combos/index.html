@@ -13,12 +13,117 @@
 <script src="./scripts/settings.js"></script>
 <script defer src="./scripts/index.js"></script>
 <!-- #endregion -->
+ <link rel="stylesheet" href="styles/index.css">
+ <link rel="stylesheet" href="styles/settings.css">
 </head>
 <!-- #endregion -->
  <!-- #region html defenitions-->
-<body style="color: white; background: black;">
-    <div class="test"></div>
-    <input type="text" oninput="save(event)">
+<body>
+    <div id="settings-wrapper">
+        <div id="settings-title">Settings</div>
+        <div id="settings-container">
+            <div class="settings-item string">
+                <div class="setting-title">Channels</div>
+                <div class="setting-description">List of channels to track chat messages from</div>
+                <div class="setting-data">
+                    <input value="" placeholder="Enter channel name...">
+                </div>
+            </div>
+            <div class="settings-item checkbox">
+                <div class="setting-title">Display timer</div>
+                <div class="setting-description">Decides whether to show or hide combo expiration timer</div>
+                <div class="setting-data">
+                    <input type="checkbox" checked>
+                </div>
+            </div>
+            <div class="settings-item  color">
+                <div class="setting-title">Text color</div>
+                <div class="setting-description">Color of regular combo text</div>
+                <div class="setting-data">
+                    <div class="hue">
+                        <div class="grabber"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-item dropdown">
+                <div class="setting-title">Display timer</div>
+                <div class="setting-description">Decides whether to show or hide combo expiration timer</div>
+                <div class="setting-data">
+                    <select>
+                        <option value="AAAA">AAAAA</option>
+                        <option value="AAAA">AAAA</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="combo-wrapper" style="display: none;">
+        <div class="entry-wrapper super">
+            <div class="entry-bg">
+                <div class="fire-stem"></div>
+                <div class="fire"></div>
+            </div>
+            <div class="entry">
+                <div class="timer"></div>
+                <div class="word">
+                    <div class="letter">W</div>
+                    <div class="letter">O</div>
+                    <div class="letter">M</div>
+                    <div class="letter">B</div>
+                    <div class="letter">O</div>
+                    <div class="letter">C</div>
+                    <div class="letter">O</div>
+                    <div class="letter">M</div>
+                    <div class="letter">B</div>
+                    <div class="letter">O</div>
+                </div>
+                <div class="counter">
+                    <div class="letter">X</div>
+                    <div class="letter">2</div>
+                    <div class="letter">5</div>
+                </div>
+            </div>
+        </div>
+        <div class="entry-wrapper mega">
+            <div class="entry-bg">
+                <div class="fire-stem"></div>
+                <div class="fire"></div>
+            </div>
+            <div class="entry">
+                <div class="timer"></div>
+                <div class="word">
+                    <div class="letter" style="animation-delay: 0.0s">T</div>
+                    <div class="letter" style="animation-delay: 0.1s">E</div>
+                    <div class="letter" style="animation-delay: 0.2s">S</div>
+                    <div class="letter" style="animation-delay: 0.3s">T</div>
+                </div>
+                <div class="counter">
+                    <div class="letter" style="animation-delay: 0.0s">X</div>
+                    <div class="letter" style="animation-delay: 0.1s">1</div>
+                    <div class="letter" style="animation-delay: 0.2s">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="entry-wrapper">
+            <div class="entry-bg">
+                <div class="fire-stem"></div>
+                <div class="fire"></div>
+            </div>
+            <div class="entry">
+                <div class="timer"></div>
+                <div class="word">
+                    <div class="letter" style="animation-delay: 0.0s">T</div>
+                    <div class="letter" style="animation-delay: 0.1s">E</div>
+                    <div class="letter" style="animation-delay: 0.2s">S</div>
+                    <div class="letter" style="animation-delay: 0.3s">T</div>
+                </div>
+                <div class="counter">
+                    <div class="letter" style="animation-delay: 0.0s">X</div>
+                    <div class="letter" style="animation-delay: 0.1s">2</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 <!-- #endregion -->
 </html>

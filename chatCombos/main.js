@@ -314,7 +314,7 @@ document.addEventListener("allmodulesready", () => {
         skipUpdatingEmotesets: true,
     });
     cl.connect();
-    cl.on("message",(channel, tags, message, self)=>{messageInput(message)})
+    cl.on("chat",(channel, tags, message, self)=>{messageInput(message)})
 })
 
 function reorder() {

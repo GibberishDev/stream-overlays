@@ -85,3 +85,9 @@ class SettingInt extends Setting {
         this.value = value
     }
 }
+// #region html menu gen
+function genSettingsMenu() {
+
+}
+const templateArray = ``
+// #endregion
