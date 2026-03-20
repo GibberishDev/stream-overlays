@@ -19,14 +19,15 @@
 <!-- #endregion -->
  <!-- #region html defenitions-->
 <body>
-    <div id="settings-wrapper">
+    <input id="open-settings" type="button" value="Open settings" onclick="genSettingsMenu()">
+    <div id="settings-wrapper" class="hidden">
         <div id="settings-title">Settings</div>
         <div id="settings-container">
             <div class="settings-item string">
                 <div class="setting-title">Channels</div>
                 <div class="setting-description">List of channels to track chat messages from</div>
                 <div class="setting-data">
-                    <input value="" placeholder="Enter channel name...">
+                    <input value="" placeholder="Enter comma separated channel names here">
                 </div>
             </div>
             <div class="settings-item checkbox">
@@ -36,25 +37,28 @@
                     <input type="checkbox" checked>
                 </div>
             </div>
-            <div class="settings-item  color">
+            <div class="settings-item color">
                 <div class="setting-title">Text color</div>
                 <div class="setting-description">Color of regular combo text</div>
                 <div class="setting-data">
-                    <div class="hue">
+                    <div class="color-preview"></div>
+                    <input class="color-hex" placeholder="ffff00">
+                    <div class="slider hue">
+                        <div class="grabber"></div>
+                    </div>
+                    <div class="slider sat">
+                        <div class="grabber"></div>
+                    </div>
+                    <div class="slider val">
                         <div class="grabber"></div>
                     </div>
                 </div>
             </div>
-            <div class="settings-item dropdown">
-                <div class="setting-title">Display timer</div>
-                <div class="setting-description">Decides whether to show or hide combo expiration timer</div>
-                <div class="setting-data">
-                    <select>
-                        <option value="AAAA">AAAAA</option>
-                        <option value="AAAA">AAAA</option>
-                    </select>
-                </div>
-            </div>
+        </div>
+        <div id="settings-controls">
+            <input type="button" value="Save" onclick="inputSaveSettings()">
+            <input type="button" value="Cancel" onclick="inputCancelSettigns()">
+            <input type="button" value="Reset" onclick="inputResetSettings()">
         </div>
     </div>
     <div id="combo-wrapper" style="display: none;">

@@ -36,7 +36,7 @@
     width: 100%;
     display: grid;
     grid-template-columns: auto auto;
-    gap: 8px;
+    gap: 16px;
     grid-auto-flow: row dense;
 }
 @media screen and (max-width: 600px) {
@@ -85,33 +85,39 @@
 .settings-item.string .setting-data,
 .settings-item.string input {
     width: 100%;
-    background: red;
-}
-.settings-item.list input {
-    flex-grow: 1;
-    min-width: 200px;
-    max-width: 400px;
-}
-.color-preview {
-    height: 24px;
-    width: 48px;
-    background: black;
-    grid-column: 2/3;
-    grid-row: 1/2;
+    grid-column: 1/-1;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    box-sizing: border-box;
+    border: none;
+    max-width: 424px;
 }
 .settings-item.color .setting-data {
+    display: grid;
+    grid-template-columns: min-content auto;
+    grid-template-rows: repeat(3, 24px);
+    height: 72px;
+    column-gap: 8px;
+    grid-row: 3/4;
     grid-column: 1/-1;
-    display: flex;
-    flex-wrap: wrap;
-    height: 24px;
+}
+.slider {
+    cursor: pointer;
+    height: 8px;
+    margin-top: 8px;
+    max-width: 400px;
 }
 .hue {
-    max-width: 300px;
-    flex-grow: 1;
-    height: 8px;
-    margin-top: auto;
-    border-radius: 2px;
     background: linear-gradient(90deg,red,#ff0 17%,#0f0 33%,#0ff 50%,#00f 66%,#f0f 83%,red);
+}
+.sat {
+    --hue: red;
+    --val: white;
+    background: linear-gradient(90deg,var(--val),var(--hue));
+}
+.val {
+    --sat: white;
+    background: linear-gradient(90deg,black,var(--sat));
 }
 .grabber {
     position: relative;
@@ -121,5 +127,124 @@
     border-radius: 2px;
     border: 2px solid white;
     top: -2px;
-    cursor: grab;
+    pointer-events: none;
+}
+.color-preview {
+    width: 16px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    background: black;
+    border-radius: 4px;
+    grid-column: 1/2;
+    grid-row: 1/-1;
+}
+* {user-select: none;}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+.cover {
+    position: fixed;
+    width: 100dvw;
+    height: 100dvh;
+    opacity: 0;
+    z-index: 100000;
+}
+#settings-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+    justify-content: center;
+    flex-grow: 1;
+    height: 24px;
+    gap: 30px;
+}
+#settings-controls input {
+    background: black;
+    color: white;
+    font-family: boldpixels;
+    font-size: 20px;
+    line-height: 24px;
+    border: 2px solid white;
+    width: 100px;
+    border-radius: 8px;
+}
+#settings-controls input:hover {
+    background: #303030;
+}
+#settings-controls input:active {
+    color: black;
+    border: 2px solid black;
+}
+.settings-item.checkbox .setting-data {
+    display: flex;
+}
+.settings-item.checkbox input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    height: 24px;
+    width: 48px;
+    box-sizing: border-box;
+    margin: 0;
+    margin-left: 20px;
+    border: 2px solid white;
+}
+.settings-item.checkbox .checkbox-vis {
+    width: 16px;
+    height: 16px;
+    position: relative;
+    left: -44px;
+    top: 4px;
+    background: red;
+    box-sizing: border-box;
+    pointer-events: none;
+    transition-duration: 150ms;
+}
+.settings-item.checkbox:has(input:hover) .checkbox-vis {
+    left: -40px;
+}
+.settings-item.checkbox:has(input:checked:hover) .checkbox-vis {
+    left: -24px;
+}
+.settings-item.checkbox:has(input:checked) .checkbox-vis {
+    background: green;
+    left: -20px;
+}
+
+#open-settings {
+    background: black;
+    color: white;
+    font-family: boldpixels;
+    font-size: 20px;
+    line-height: 24px; 
+    border: 2px solid white;
+    width: 200px;
+    border-radius: 8px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    animation: fade 1s 2s linear forwards;
+}
+#open-settings:hover {
+    background: #303030;
+}
+#open-settings:active {
+    color: black;
+    border: 2px solid black;
+}
+@keyframes fade {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
 }
