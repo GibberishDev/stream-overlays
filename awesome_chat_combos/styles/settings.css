@@ -38,7 +38,6 @@
     display: grid;
     grid-template-columns: auto auto;
     gap: 16px;
-    grid-auto-flow: row dense;
 }
 @media screen and (max-width: 600px) {
     #settings-container {

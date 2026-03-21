@@ -1,5 +1,6 @@
 var moduleStates = new Map()
 var readyCount = 0
+var moduleIDS = []
 
 function moduleReady(moduleID) {
     let ev = new Event("moduleready")
@@ -19,9 +20,8 @@ function moduleReady(moduleID) {
 }
 
 function setModuleList(moduleList) {
-    for (let module of moduleList) {
-        moduleStates.set(module, false)
-    }
+    moduleIDS = moduleList
+    reload()
 }
 
 function checkModules() {
@@ -33,4 +33,12 @@ function ready() {
     let ev = new Event("allmodulesready")
     document.dispatchEvent(ev)
     console.info("ALL - all modules ready")
+}
+
+function reload() {
+    for (let module of moduleIDS) {
+        moduleStates.set(module, false)
+    }
+    readyCount = 0
+    console.log()
 }

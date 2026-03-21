@@ -5,6 +5,7 @@
 
 :root {
     --timer: none;
+    --super-bg: 1;
     --text-color: #ffff00;
 }
 
@@ -32,6 +33,7 @@ body {
     transition-duration: 150ms;
 }
 .entry-bg {
+    opacity: var(--super-bg);
     transition-duration: 150ms;
     width: 0;
     display: flex;

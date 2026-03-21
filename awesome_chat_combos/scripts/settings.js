@@ -94,10 +94,10 @@ class SettingNumber extends Setting {
         if (this.step) if (value % this.step != 0) { value = Math.round(value / this.step) * this.step }
         this.value = value
         console.log("value set for " + this.id + ": " + this.value)
-        return value
         let ev = new Event("settingchanged")
         ev.id = this.id
         document.dispatchEvent(ev)
+        return value
     }
 }
 class SettingEmpty extends Setting {
@@ -138,6 +138,7 @@ const templateColor = `
 </div>
 `
 function genSettingsMenu() {
+    document.querySelector("#content-preview").style.display = ""
     let elementsList = []
     document.querySelector("#open-settings").style.display = "none"
     document.querySelector("#settings-wrapper").classList.remove("hidden")
@@ -237,7 +238,7 @@ function hookNumberInput(el, id) {
         el.dataset.lastValue = registeredSettings.get(id).get()
     }
     el.onblur = () => {
-        if (registeredSettings.get(id).set(el.value) != false) {
+        if (registeredSettings.get(id).set(el.value) !== false) {
             el.value = registeredSettings.get(id).get()
         } else {
             el.value = el.dataset.lastValue
@@ -390,15 +391,19 @@ class HSV {
 }
 function inputSaveSettings() {
     saveSettings()
+    retrieveSettings()
     document.querySelector("#settings-container").innerHTML = ""
     document.querySelector("#settings-wrapper").classList.add("hidden")
+    document.querySelector("#content-preview").style.display = "none"
     settingsOpen = false
     document.querySelector("#open-settings").style.display = ""
+    start()
 }
 function inputCancelSettigns() {
     retrieveSettings()
     document.querySelector("#settings-container").innerHTML = ""
     document.querySelector("#settings-wrapper").classList.add("hidden")
+    document.querySelector("#content-preview").style.display = "none"
     settingsOpen = false
     document.querySelector("#open-settings").style.display = ""
 }
