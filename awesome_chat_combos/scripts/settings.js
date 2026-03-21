@@ -34,6 +34,7 @@ const SETTING_TYPE = Object.freeze({
     NUMBER : 2,
     BOOL : 3,
     COLOR : 4,
+    EMPTY: 5,
 })
 
 class Setting {
@@ -50,7 +51,10 @@ class Setting {
     get() {return this.value}
     set(value) {
         this.value = value
-        console.log(this.id, this.value)
+        console.log("value set for " + this.id + ": " + this.value)
+        let ev = new Event("settingchanged")
+        ev.id = this.id
+        document.dispatchEvent(ev)
     }
 }
 
@@ -91,6 +95,14 @@ class SettingNumber extends Setting {
         this.value = value
         console.log("value set for " + this.id + ": " + this.value)
         return value
+        let ev = new Event("settingchanged")
+        ev.id = this.id
+        document.dispatchEvent(ev)
+    }
+}
+class SettingEmpty extends Setting {
+    constructor() {
+        super(uuidv4(),SETTING_TYPE.EMPTY,"","","")
     }
 }
 // #region html menu gen
@@ -140,9 +152,9 @@ function genSettingsMenu() {
                 el.innerHTML = templateString
                 el.querySelector(".setting-title").textContent = setting.name
                 el.querySelector(".setting-description").textContent = setting.description
-                el.querySelector(".seting-data input").value = setting.get()
-                el.querySelector(".seting-data input").placeholder = "Enter string value here"
-                hookStringInput(el.querySelector(".seting-data input"), setting.id)
+                el.querySelector(".input").value = setting.get()
+                el.querySelector(".input").placeholder = "Enter string value here"
+                hookStringInput(el.querySelector(".input"), setting.id)
                 break
             }
             case SETTING_TYPE.ARRAY : {
@@ -196,8 +208,13 @@ function genSettingsMenu() {
                 el.innerHTML = templateColor
                 el.querySelector(".setting-title").textContent = setting.name
                 el.querySelector(".setting-description").textContent = setting.description
-                hookColorInput(el.querySelector(".setting-data"), setting.id)
+                setTimeout(()=>{hookColorInput(el.querySelector(".setting-data"), setting.id)},1)
                 break
+            }
+            case SETTING_TYPE.EMPTY : {
+                let el = document.createElement('div')
+                document.querySelector("#settings-container").appendChild(el)
+                el.classList.add("settings-item","empty")
             }
         }
     }
@@ -241,12 +258,15 @@ function hookColorInput(el, id) {
     let sat = el.querySelector(".sat")
     let val = el.querySelector(".val")
     let color = new HSV().fromHex(registeredSettings.get(id).get())
-    hue.dataset.value = color.h/360
-    sat.dataset.value = color.s/100
-    val.dataset.value = color.v/100
-    hue.querySelector(".grabber").style.left = (color.h/360*(hue.getBoundingClientRect().width - 10)) + "px"
-    sat.querySelector(".grabber").style.left = (color.s/100*(hue.getBoundingClientRect().width - 10)) + "px"
-    val.querySelector(".grabber").style.left = (color.v/100*(hue.getBoundingClientRect().width - 10)) + "px"
+    hue.dataset.value = color.h/360.0
+    sat.dataset.value = color.s/100.0
+    val.dataset.value = color.v/100.0
+    sat.style.setProperty("--hue",new HSV(color.h,100,color.v).toHex())
+    sat.style.setProperty("--val",new HSV(color.h,0,color.v).toHex())
+    val.style.setProperty("--sat",new HSV(color.h,color.s,100).toHex())
+    hue.querySelector(".grabber").style.left = (hue.dataset.value*(hue.offsetWidth - 10)) + "px"
+    sat.querySelector(".grabber").style.left = (sat.dataset.value*(sat.offsetWidth - 10)) + "px"
+    val.querySelector(".grabber").style.left = (val.dataset.value*(sat.offsetWidth - 10)) + "px"
     el.querySelector(".color-preview").style.setProperty("background",registeredSettings.get(id).get())
     hue.addEventListener("mousedown",(event)=>{
         handleColorDrag(event, hue, id)

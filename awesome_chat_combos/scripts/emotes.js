@@ -6,6 +6,11 @@ let twitchChannelEmoteCodeToId = new Map()
 
 // Uses teklynk's https://github.com/teklynk/twitch_api_public
 async function fetchEmotes(channels) {
+    bttvEmoteCodeToId = new Map()
+    ffzEmoteCodeToId = new Map()
+    seventvEmoteCodeToId = new Map()
+    twitchGlobalEmoteCodeToId = new Map()
+    twitchChannelEmoteCodeToId = new Map()
     let response = await fetch("https://twitchapi.teklynk.com/getglobalemotes.php")
     var emotes = (await response.json())["data"]
     twitchGlobalEmoteCodeToId = new Map(emotes.map(emote => [emote["name"], emote["id"]]))

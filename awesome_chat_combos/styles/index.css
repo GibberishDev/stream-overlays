@@ -5,11 +5,11 @@
 
 :root {
     --timer: none;
+    --text-color: #ffff00;
 }
 
 body {
     margin: 0;
-    font-family: boldpixels;
     background: #000000a0;
     overflow: hidden;
 }
@@ -51,6 +51,9 @@ body {
     display: flex;
 }
 .entry {
+    position: relative;
+    font-family: boldpixels;
+    user-select: none;
     display: flex;
     flex-direction: row;
     gap: 8px;
@@ -58,7 +61,7 @@ body {
     font-size: 24px;
     line-height: 24px;
     -webkit-text-stroke: 1.5px black;
-    color: yellow;
+    color: var(--text-color);
     padding-left: 6px;
     padding-right: 6px;
     transition-duration: 150ms;
@@ -139,4 +142,86 @@ body {
 }
 .entry-wrapper.super .entry {
     translate: calc(-100% - 100px) 0;
+}
+.combo-wrapper {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+}
+.pos-left {
+    flex-direction: column;
+    left: 0;
+    top: 50%;
+    translate: 0 -50%;
+}
+.pos-top-left {
+    flex-direction: column;
+    left: 0;
+    top: 0;
+}
+.pos-bottom-left {
+    flex-direction: column-reverse;
+    left: 0;
+    bottom: 0;
+}
+.pos-right {
+    flex-direction: column;
+    right: 0;
+    top: 50%;
+    translate: 0 -50%;
+    align-items: end;
+}
+.pos-top-right {
+    flex-direction: column;
+    right: 0;
+    top: 0;
+    align-items: end;
+}
+.pos-bottom-right {
+    flex-direction: column-reverse;
+    right: 0;
+    bottom: 0;
+    align-items: end;
+}
+
+
+.pos-top-right .entry-wrapper.super .entry,
+.pos-bottom-right .entry-wrapper.super .entry,
+.pos-right .entry-wrapper.super .entry{
+    translate: none;
+}
+.pos-top-right .entry-wrapper,
+.pos-bottom-right .entry-wrapper,
+.pos-right .entry-wrapper{
+    flex-direction: row;
+    justify-content: end;
+}
+.pos-top-right .entry,
+.pos-bottom-right .entry,
+.pos-right .entry{
+    flex-direction: row-reverse;
+}
+.pos-top-right .entry-bg ,
+.pos-bottom-right .entry-bg ,
+.pos-right .entry-bg {
+    flex-direction: row-reverse;
+    translate: calc(100% - 100px);
+    position: relative;
+}
+.pos-top-right .fire,
+.pos-bottom-right .fire,
+.pos-right .fire{
+    scale: -1 1;
+}
+#notification {
+    color: var(--text-color);
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    width: 100dvw;
+    height: 100dvh;
+    align-items: center;
+    pointer-events: none;
 }
