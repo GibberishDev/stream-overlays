@@ -163,7 +163,6 @@ function genSettingsMenu() {
                 el.innerHTML = templateString
                 el.querySelector(".setting-title").textContent = setting.name
                 el.querySelector(".setting-description").textContent = setting.description
-                console.log(Array.from(setting.get()))
                 el.querySelector(".input").value = Array.from(setting.get()).toString()
                 el.querySelector(".input").placeholder = "Enter comma separated values here"
                 hookArrayInput(el.querySelector(".input"), setting.id)
@@ -222,7 +221,6 @@ function genSettingsMenu() {
 
 function hookStringInput(el, id) {
     el.onblur = () => {
-        console.log(el.value)
         registeredSettings.get(id).set(el.value)
     }
 }
