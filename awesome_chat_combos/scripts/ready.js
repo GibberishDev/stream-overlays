@@ -40,5 +40,4 @@ function reload() {
         moduleStates.set(module, false)
     }
     readyCount = 0
-    console.log()
 }

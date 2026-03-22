@@ -16,7 +16,7 @@ function uuidv4() {
 
 
 // #region settings
-new SettingArray("channels", [], "Channels", "List of channels to track chat messages from")
+new SettingArray("channelList", [], "Channels", "List of channels to track chat messages from")
 new SettingString("position","bottom-left","Position anchor","Defines position of the anchor for combos. Avaliable values: 'top-left','left','bottom-left','top-right','right','bottom-right'")
 new SettingBool("showtimer", false, "Display timer", "Decides whether to show or hide combo expiration timer")
 new SettingBool("ffz", true, "Enable FFZ emotes", "Include FrankerFaceZ emotes in the set")
@@ -24,7 +24,7 @@ new SettingBool("showcounter", true, "Display counter", "Decides whether to show
 new SettingBool("bttv", true, "Enable BTTV emotes", "Include BetterTTV emotes in the set")
 new SettingBool("displayemotes", true, "Display emotes", "Decides whether to replace text with emotes")
 new SettingBool("seventv", true, "Enable 7TV emotes", "Include 7TV emotes in the set")
-new SettingBool("exclam", true, "Ignore !", "Ignore words starting with exclamation mark (!) in combos")
+new SettingBool("exclam", true, "Ignore !", "Ignore messages starting with exclamation mark (!) in combos")
 new SettingBool("bots", true, "Ignore bot messages", "Ignore message if it was sent by bot")
 new SettingBool("supercombobg", true, "Display super combo background", "Show or hide super combo flaming pipe background")
 new SettingArray("botarray", ["nightbot","streamelements","sery_bot","wizebot","moobot","tangiabot","streamlabs"], "Bot names", "List of bot channels to ignore if 'Ignore bot messages' setting is on")
@@ -153,13 +153,13 @@ setModuleList([
 document.addEventListener("moduleready",(ev)=>{
     if (ev.module == "emotes") {
         var notifId = uuidv4()
-        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Loaded emotes for channels: " + registeredSettings.get("channels").value.toString() + "</div>"
-        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Total emotes loaded: " + (bttvEmoteCodeToId.size + ffzEmoteCodeToId.size + seventvEmoteCodeToId.size + twitchGlobalEmoteCodeToId.size + twitchChannelEmoteCodeToId.size) + "</div>"
-        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Twitch global: " + (twitchGlobalEmoteCodeToId.size) + "</div>"
-        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Twitch channel: " + (twitchChannelEmoteCodeToId.size) + "</div>"
-        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>FFZ: " + (ffzEmoteCodeToId.size) + "</div>"
-        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>BTTV: " + (bttvEmoteCodeToId.size) + "</div>"
-        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>7TV: " + (seventvEmoteCodeToId.size) + "</div>"
+        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Loaded emotes for channels: " + registeredSettings.get("channelList").get().toString() + "</div>"
+        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Total emotes loaded: " + (Object.keys(bttvEmoteCodeToId).length + Object.keys(ffzEmoteCodeToId).length + Object.keys(seventvEmoteCodeToId).length + Object.keys(twitchGlobalEmoteCodeToId).length + Object.keys(twitchChannelEmoteCodeToId).length) + "</div>"
+        // document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Twitch global: " + (Object.keys(twitchGlobalEmoteCodeToId).length) + "</div>"
+        // document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Twitch channel: " + (Object.keys(twitchChannelEmoteCodeToId).length) + "</div>"
+        // document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>FFZ: " + (Object.keys(ffzEmoteCodeToId).length) + "</div>"
+        // document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>BTTV: " + (Object.keys(bttvEmoteCodeToId).length) + "</div>"
+        // document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>7TV: " + (Object.keys(seventvEmoteCodeToId).length) + "</div>"
         setTimeout(()=>{document.querySelectorAll("[data-id='" + notifId + "']").forEach((el)=>{el.remove()})}, 5000)
     }
 })
@@ -169,43 +169,43 @@ function start() {
     reload()
     initSettings()
     document.querySelector("#notification").innerHTML = ""
-    if (registeredSettings.get("channels").get().toString() === [].toString()) {
+    if (registeredSettings.get("channelList").get().toString() === [].toString()) {
         var notifId = uuidv4()
         document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>No channel set. Aborting startup</div>"
-        setTimeout(()=>{document.querySelector("[data-id='" + notifId + "']").remove()}, 5000)
+        setTimeout(()=>{if(document.querySelector("[data-id='" + notifId + "']"))document.querySelector("[data-id='" + notifId + "']").remove()}, 5000)
         return
     }
     if (registeredSettings.get("displayemotes").get() == true) {
         var notifId = uuidv4()
-        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Loading emotes for channels: " + registeredSettings.get("channels").value.toString() + "</div>"
-        setTimeout(()=>{document.querySelector("[data-id='" + notifId + "']").remove()}, 5000)
+        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Loading emotes for channels: " + registeredSettings.get("channelList").get().toString() + "</div>"
+        setTimeout(()=>{if(document.querySelector("[data-id='" + notifId + "']"))document.querySelector("[data-id='" + notifId + "']").remove()}, 5000)
+        registeredSettings.get("channelList").get().toString()
         fetchEmotes(
-            registeredSettings.get("channels").value,
+            Array.from(registeredSettings.get("channelList").get()),
             registeredSettings.get("ffz").get(),
             registeredSettings.get("bttv").get(),
             registeredSettings.get("seventv").get()
         )
     }
+    
     let cl = new tmi.Client({
-        channels: registeredSettings.get("channels").get(),
+        channels: Array.from(registeredSettings.get("channelList").get()),
         connection: {reconnect: true},
         skipMembership: true,
         skipUpdatingEmotesets: true,
     });
     cl.connect();
-    cl.on("chat",(channel, tags, message, self)=>{messageInput(channel, tags, message)})
+    cl.on("message",(channel, tags, message, self)=>{messageInput(channel, tags, message)})
 }
 
 function messageInput(channel, tags, message) {
     console.log(channel, tags, message)
+    if (registeredSettings.get("bots").get()) {
+        if (Array.from(registeredSettings.get("botarray").get()).includes(tags.username)) return
+    }
+    if (registeredSettings.get("exclam").get()) {
+        if (message[0] == "!") return
+    }
 }
-
-
-
-
-
-
-
-
 
 start()

@@ -51,7 +51,6 @@ class Setting {
     get() {return this.value}
     set(value) {
         this.value = value
-        console.log("value set for " + this.id + ": " + this.value)
         let ev = new Event("settingchanged")
         ev.id = this.id
         document.dispatchEvent(ev)
@@ -93,7 +92,6 @@ class SettingNumber extends Setting {
         if (this.maxValue) { if (value > this.maxValue) value = this.maxValue }
         if (this.step) if (value % this.step != 0) { value = Math.round(value / this.step) * this.step }
         this.value = value
-        console.log("value set for " + this.id + ": " + this.value)
         let ev = new Event("settingchanged")
         ev.id = this.id
         document.dispatchEvent(ev)
@@ -138,8 +136,8 @@ const templateColor = `
 </div>
 `
 function genSettingsMenu() {
-    document.querySelector("#content-preview").style.display = ""
     let elementsList = []
+    document.querySelector("#content-preview").style.display = ""
     document.querySelector("#open-settings").style.display = "none"
     document.querySelector("#settings-wrapper").classList.remove("hidden")
     document.querySelector("#settings-container").innerHTML = ""
@@ -165,7 +163,8 @@ function genSettingsMenu() {
                 el.innerHTML = templateString
                 el.querySelector(".setting-title").textContent = setting.name
                 el.querySelector(".setting-description").textContent = setting.description
-                el.querySelector(".input").value = setting.get().toString()
+                console.log(Array.from(setting.get()))
+                el.querySelector(".input").value = Array.from(setting.get()).toString()
                 el.querySelector(".input").placeholder = "Enter comma separated values here"
                 hookArrayInput(el.querySelector(".input"), setting.id)
                 break
@@ -223,6 +222,7 @@ function genSettingsMenu() {
 
 function hookStringInput(el, id) {
     el.onblur = () => {
+        console.log(el.value)
         registeredSettings.get(id).set(el.value)
     }
 }
@@ -408,6 +408,7 @@ function inputCancelSettigns() {
     document.querySelector("#open-settings").style.display = ""
 }
 function inputResetSettings() {
+    localStorage.clear()
     for (let id of registeredSettings.keys()) {
         registeredSettings.get(id).set(registeredSettings.get(id).defaultValue)
     }
