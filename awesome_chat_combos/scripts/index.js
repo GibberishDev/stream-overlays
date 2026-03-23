@@ -325,7 +325,7 @@ function handleRepeats(words, emotes) {
 
 function getLevel(repetitions) {
     var level = 0
-    if (parseInt(registeredSettings.get("numberregular").get()) != 0 && repetitions > parseInt(registeredSettings.get("numberregular").get())) level = 1
+    if (parseInt(registeredSettings.get("numberregular").get()) != 0 && repetitions >= parseInt(registeredSettings.get("numberregular").get())) level = 1
     if (parseInt(registeredSettings.get("numbermega").get()) != 0 && repetitions >= parseInt(registeredSettings.get("numbermega").get())) level = 2
     if (parseInt(registeredSettings.get("numbersuper").get()) != 0 && repetitions >= parseInt(registeredSettings.get("numbersuper").get())) level = 3
     return level
