@@ -1,3 +1,7 @@
+if (getComputedStyle(document.documentElement).getPropertyValue("--reverse") == 1) {
+    document.querySelector("#anchor").classList.add("reverse")
+}
+
 let interval = 1000 //File contents check interval in ms.
 
 var lastTrackData = JSON.parse("{}") //Variable of now playing track details from last check for new file to be compared against
@@ -25,7 +29,7 @@ Example data from MPRIS source (MPRIS is cause i dont have access to spotify eve
  * so its basically bshing rocks against other rocks here.
  */
 function fetchFile() {
-    fetch("data.json") /*Fetch file*/ 
+    fetch("data.json") /*Fetch file*/
         .then(responce => {
             if (!responce.ok) {return "null"} /* no file -> fkn die */
             responce.text() /* get string contents of file */
@@ -49,9 +53,9 @@ function checkData(trackData) {
         "artists": trackData.artists
     } /* construct data object with track data we are interested in */
     if (newData.title != lastTrackData.title) { /* if not same as last one -> update DOM */
-        console.log("aaa")
         lastTrackData = newData
-        updateDomContent()
+        setTimeout(updateDomContent, 1000)
+        
     }
 }
 
@@ -81,7 +85,6 @@ function triggerReflow(element) {
  * triggers fetch file in intervals
  */
 function ticker() {
-    console.log(lastTrackData)
     fetchFile()
     setTimeout(ticker, interval) /* restart self */
 }
