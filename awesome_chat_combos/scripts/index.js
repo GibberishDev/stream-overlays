@@ -267,9 +267,6 @@ function messageInput(channel, tags, message) {
         if (Array.from(registeredSettings.get("botarray").get()).includes(tags.username)) return
     }
     let words = message.replace(/[\u0000-\u001F\u007F-\u009F]/g, "").replace(/(\!( |$))|([\.\,\?])/g," ").replace(/([\"\'])/g,"").split(" ")
-    if (registeredSettings.get("samemessage").get() != true) {
-        words = Array.from(new Set(words))
-    }
     let foundWordRepeats = []
     let foundEmoteRepeats = []
     for (let word of words) {
@@ -284,6 +281,9 @@ function messageInput(channel, tags, message) {
         word = word.toLowerCase()
         if (registeredSettings.get("blacklist").get().includes(word)) continue
         foundWordRepeats.push(word)
+    }
+    if (registeredSettings.get("samemessage").get() != true) {
+        foundWordRepeats = Array.from(new Set(foundWordRepeats))
     }
     handleRepeats(foundWordRepeats, foundEmoteRepeats)
 }
@@ -385,7 +385,7 @@ function updateWordHTML(word) {
         el.innerHTML = `<div class="entry-bg"><div class="fire-stem"></div><div class="fire"></div></div><div class="entry"><div class="timer"></div><div class="word"></div><div class="counter"></div></div>`
         for (let [i, letter] of Array.from(word).entries()) {
             if (i + 1 <= parseInt(registeredSettings.get("lettersnumber").get())) {
-                el.querySelector(".word").innerHTML += `<div class='letter' style='--delay:${i * 0.1}s'>${letter}</div>`
+                el.querySelector(".word").innerHTML += `<div class='letter' style='--delay:${i * 0.1}s'>${letter.toUpperCase()}</div>`
             } else {
                 el.querySelector(".word").innerHTML += `<div class='letter' style='--delay:${i * 0.1}s'>…</div>`
                 break
