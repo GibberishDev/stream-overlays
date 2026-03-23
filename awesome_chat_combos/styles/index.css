@@ -6,6 +6,7 @@
 :root {
     --timer: none;
     --super-bg: 1;
+    --super-bg-display: flex;
     --text-color: #ffff00;
 }
 #combo-wrapper {
@@ -36,10 +37,10 @@ body {
     transition-duration: 150ms;
 }
 .entry-bg {
+    display: var(--super-bg-display);
     opacity: var(--super-bg);
     transition-duration: 150ms;
     width: 0;
-    display: flex;
     flex-direction: row;
     top: 0;
     z-index: -1;
@@ -178,7 +179,7 @@ body {
     width: 100%;
 }
 .entry-wrapper.super .entry {
-    translate: calc(-100% - 100px) 0;
+    translate: calc((-100% - 100px) * var(--super-bg)) 0;
 }
 .combo-wrapper {
     position: absolute;
@@ -219,6 +220,28 @@ body {
     right: 0;
     bottom: 0;
     align-items: end;
+}
+.pos-center {
+    flex-direction: column;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 50%;
+    translate: 0 -50%;
+    align-items: center;
+}
+.pos-top-center {
+    flex-direction: column;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0;
+    align-items: center;
+}
+.pos-bottom-center {
+    flex-direction: column-reverse;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    align-items: center;
 }
 
 

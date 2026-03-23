@@ -83,6 +83,27 @@ document.addEventListener("settingchanged",(ev)=>{
                     })
                     break
                 }
+                case "top-center" : {
+                    document.querySelectorAll(".combo-wrapper").forEach((el)=>{
+                        el.className = ''
+                        el.classList.add("combo-wrapper","pos-top-center")
+                    })
+                    break
+                }
+                case "bottom-center" : {
+                    document.querySelectorAll(".combo-wrapper").forEach((el)=>{
+                        el.className = ''
+                        el.classList.add("combo-wrapper","pos-bottom-center")
+                    })
+                    break
+                }
+                case "center" : {
+                    document.querySelectorAll(".combo-wrapper").forEach((el)=>{
+                        el.className = ''
+                        el.classList.add("combo-wrapper","pos-center")
+                    })
+                    break
+                }
                 default : {
                     document.querySelectorAll(".combo-wrapper").forEach((el)=>{
                         el.className = ''
@@ -132,8 +153,10 @@ document.addEventListener("settingchanged",(ev)=>{
         case "supercombobg" : {
             if (registeredSettings.get("supercombobg").get()) {
                 document.documentElement.style.setProperty("--super-bg", 1)
+                document.documentElement.style.setProperty("--super-bg-display", "flex")
             } else {
                 document.documentElement.style.setProperty("--super-bg", 0)
+                document.documentElement.style.setProperty("--super-bg-display", "none")
             }
             break
         }
@@ -158,11 +181,11 @@ document.addEventListener("moduleready",(ev)=>{
         var notifId = uuidv4()
         document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Loaded emotes for channels: " + channels.toString() + "</div>"
         document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Total emotes loaded: " + (Object.keys(bttvEmoteCodeToId).length + Object.keys(ffzEmoteCodeToId).length + Object.keys(seventvEmoteCodeToId).length + Object.keys(twitchGlobalEmoteCodeToId).length + Object.keys(twitchChannelEmoteCodeToId).length) + "</div>"
-        // document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Twitch global: " + (Object.keys(twitchGlobalEmoteCodeToId).length) + "</div>"
-        // document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Twitch channel: " + (Object.keys(twitchChannelEmoteCodeToId).length) + "</div>"
-        // document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>FFZ: " + (Object.keys(ffzEmoteCodeToId).length) + "</div>"
-        // document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>BTTV: " + (Object.keys(bttvEmoteCodeToId).length) + "</div>"
-        // document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>7TV: " + (Object.keys(seventvEmoteCodeToId).length) + "</div>"
+        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Twitch global: " + (Object.keys(twitchGlobalEmoteCodeToId).length) + "</div>"
+        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Twitch channel: " + (Object.keys(twitchChannelEmoteCodeToId).length) + "</div>"
+        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>FFZ: " + (Object.keys(ffzEmoteCodeToId).length) + "</div>"
+        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>BTTV: " + (Object.keys(bttvEmoteCodeToId).length) + "</div>"
+        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>7TV: " + (Object.keys(seventvEmoteCodeToId).length) + "</div>"
         setTimeout(()=>{document.querySelectorAll("[data-id='" + notifId + "']").forEach((el)=>{el.remove()})}, 5000)
     }
 })
@@ -232,7 +255,7 @@ function messageInput(channel, tags, message) {
     if (tags["emotes-raw"]) {
         let emotes = getOtherChannelTwitchEmotes(message,tags.emotes)
         for (let emote in emotes) {
-            twitchChannelEmoteCodeToId[emote] = emotes.id
+            twitchChannelEmoteCodeToId[emote] = emotes[emote].id
         }
     }
     if (registeredSettings.get("bots").get()) {
@@ -404,7 +427,9 @@ function updateEmoteHTML(emote) {
         container.appendChild(el)
         el.dataset.id = comboWords[emote].id
         el.innerHTML = `<div class="entry-bg"><div class="fire-stem"></div><div class="fire"></div></div><div class="entry"><div class="timer"></div><div class="word"></div><div class="counter"></div></div>`
-        el.querySelector(".word").innerHTML = `<img class="letter" src="${getEmoteImageUrl(emote)}">`
+        let url = getEmoteImageUrl(emote)
+        console.log(url)
+        el.querySelector(".word").innerHTML = `<img class="letter" src="${url}" onerror="this.src=${url}">`
     }
     switch (comboWords[emote].level) {
         case 1 : {
