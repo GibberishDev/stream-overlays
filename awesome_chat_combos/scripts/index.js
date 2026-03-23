@@ -18,6 +18,7 @@ function uuidv4() {
 new SettingArray("channelList", [], "Channels", "List of channels to track chat messages from")
 new SettingString("position","bottom-left","Position anchor","Defines position of the anchor for combos. Avaliable values: 'top-left','left','bottom-left','top-center','center','bottom-center','top-right','right','bottom-right'")
 new SettingBool("showtimer", false, "Display timer", "Decides whether to show or hide combo expiration timer")
+new SettingNumber("sizemult", 1.0, 0.1, null, 0.1, "Scale", "Controls scaling")
 new SettingBool("ffz", true, "Enable FFZ emotes", "Include FrankerFaceZ emotes in the set")
 new SettingBool("showcounter", true, "Display counter", "Decides whether to show or hide combo counter")
 new SettingBool("bttv", true, "Enable BTTV emotes", "Include BetterTTV emotes in the set")
@@ -44,6 +45,10 @@ document.addEventListener("settingchanged",(ev)=>{
     switch (ev.id) {
         case "textcolor" : {
             document.documentElement.style.setProperty("--text-color",registeredSettings.get("textcolor").value)
+            break
+        }
+        case "sizemult" : {
+            document.documentElement.style.setProperty("--var-scale",parseFloat(registeredSettings.get("sizemult").value))
             break
         }
         case "position" : {
@@ -181,11 +186,11 @@ document.addEventListener("moduleready",(ev)=>{
         var notifId = uuidv4()
         document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Loaded emotes for channels: " + channels.toString() + "</div>"
         document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Total emotes loaded: " + (Object.keys(bttvEmoteCodeToId).length + Object.keys(ffzEmoteCodeToId).length + Object.keys(seventvEmoteCodeToId).length + Object.keys(twitchGlobalEmoteCodeToId).length + Object.keys(twitchChannelEmoteCodeToId).length) + "</div>"
-        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Twitch global: " + (Object.keys(twitchGlobalEmoteCodeToId).length) + "</div>"
-        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Twitch channel: " + (Object.keys(twitchChannelEmoteCodeToId).length) + "</div>"
-        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>FFZ: " + (Object.keys(ffzEmoteCodeToId).length) + "</div>"
-        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>BTTV: " + (Object.keys(bttvEmoteCodeToId).length) + "</div>"
-        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>7TV: " + (Object.keys(seventvEmoteCodeToId).length) + "</div>"
+        // document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Twitch global: " + (Object.keys(twitchGlobalEmoteCodeToId).length) + "</div>"
+        // document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Twitch channel: " + (Object.keys(twitchChannelEmoteCodeToId).length) + "</div>"
+        // document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>FFZ: " + (Object.keys(ffzEmoteCodeToId).length) + "</div>"
+        // document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>BTTV: " + (Object.keys(bttvEmoteCodeToId).length) + "</div>"
+        // document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>7TV: " + (Object.keys(seventvEmoteCodeToId).length) + "</div>"
         setTimeout(()=>{document.querySelectorAll("[data-id='" + notifId + "']").forEach((el)=>{el.remove()})}, 5000)
     }
 })

@@ -8,6 +8,7 @@
     --super-bg: 1;
     --super-bg-display: flex;
     --text-color: #ffff00;
+    --var-scale: 1.0;
 }
 #combo-wrapper {
     margin-top: 8px;
@@ -19,20 +20,20 @@ body {
     overflow: hidden;
 }
 .fire {
-    height: 24px;
-    width: 100px;
+    height: calc(24px * var(--var-scale));
+    width: calc(100px * var(--var-scale));
     position: relative;
-    image-rendering: crisp-edges;
+    image-rendering: pixelated;
     background: url(../assets/fire.gif);
-    background-size: auto 24px;
+    background-size: auto calc(24px * var(--var-scale));
     background-repeat: no-repeat;
 }
 .fire-stem {
-    height: 24px;
-    image-rendering: crisp-edges;
+    height: calc(24px * var(--var-scale));
+    image-rendering: pixelated;
     background: url(../assets/fire_stem.png);
-    background-size: auto 24px;
-    width: calc(100% - 100px);
+    background-size: auto calc(24px * var(--var-scale));
+    width: calc(100% - 100px * var(--var-scale));
     background-repeat: repeat-x;
     transition-duration: 150ms;
 }
@@ -65,25 +66,25 @@ body {
     user-select: none;
     display: flex;
     flex-direction: row;
-    gap: 8px;
-    height: 24px;
-    font-size: 24px;
-    line-height: 24px;
+    gap: calc(8px * var(--var-scale));
+    height: calc(24px * var(--var-scale));
+    font-size: calc(24px * var(--var-scale));
+    line-height: calc(24px * var(--var-scale));
     text-shadow: 0px 0px 2px black;
     color: var(--text-color);
-    padding-left: 6px;
-    padding-right: 6px;
+    padding-left: calc(6px * var(--var-scale));
+    padding-right: calc(6px * var(--var-scale));
     transition-duration: 150ms;
 }
 .timer {
     display: var(--timer);
     --duration: 10000ms;
     background-image: conic-gradient(transparent, var(--time-left), var(--timer-color), var(--time-left), var(--timer-color));
-    height: 14px;
+    height: calc(14px * var(--var-scale));
     border: 2px solid black;
     aspect-ratio: 1;
     border-radius: 100%;
-    margin-top: 2px;
+    margin-top: calc(2px * var(--var-scale));
     animation: timer var(--duration) 0s linear 1 forwards;
     transition-duration: 200ms;
 }
@@ -118,10 +119,10 @@ body {
     inherits: false;
 }
 @keyframes shake {
-    0% { transform: translate(0, -1px) }
-    25% { transform: translate(-1px, 1px) }
-    50% { transform: translate(1px, 0px) }
-    75% { transform: translate(-1px, 1px) }
+    0% { transform: translate(0, calc(-1px * var(--var-scale))) }
+    25% { transform: translate(calc(-1px * var(--var-scale)), calc(1px * var(--var-scale))) }
+    50% { transform: translate(calc(1px * var(--var-scale)), 0px) }
+    75% { transform: translate(calc(-1px * var(--var-scale)), calc(1px * var(--var-scale))) }
     100% { transform: translate(0, -1px) }
 }
 @keyframes color-shift-fire {
@@ -139,7 +140,7 @@ body {
 }
 @keyframes wave {
     0% { transform: translateY(0px) }
-    50% { transform: translateY(2px) }
+    50% { transform: translateY(calc(2px * var(--var-scale))) }
     100% { transform: translateY(0px) }
 }
 @keyframes color-shift-rainbow {
@@ -179,7 +180,7 @@ body {
     width: 100%;
 }
 .entry-wrapper.super .entry {
-    translate: calc((-100% - 100px) * var(--super-bg)) 0;
+    translate: calc((-100% - 100px * var(--var-scale)) * var(--super-bg)) 0;
 }
 .combo-wrapper {
     position: absolute;
@@ -191,16 +192,19 @@ body {
     left: 0;
     top: 50%;
     translate: 0 -50%;
+    transform-origin: 0 50%;
 }
 .pos-top-left {
     flex-direction: column;
     left: 0;
     top: 0;
+    transform-origin: 0 0;
 }
 .pos-bottom-left {
     flex-direction: column-reverse;
     left: 0;
     bottom: 0;
+    transform-origin: 0 100%;
 }
 .pos-right {
     flex-direction: column;
@@ -208,18 +212,21 @@ body {
     top: 50%;
     translate: 0 -50%;
     align-items: end;
+    transform-origin: 100% 50%;
 }
 .pos-top-right {
     flex-direction: column;
     right: 0;
     top: 0;
     align-items: end;
+    transform-origin: 100% 0%;
 }
 .pos-bottom-right {
     flex-direction: column-reverse;
     right: 0;
     bottom: 0;
     align-items: end;
+    transform-origin: 100% 100%;
 }
 .pos-center {
     flex-direction: column;
@@ -228,6 +235,7 @@ body {
     top: 50%;
     translate: 0 -50%;
     align-items: center;
+    transform-origin: 50% 50%;
 }
 .pos-top-center {
     flex-direction: column;
@@ -235,6 +243,7 @@ body {
     transform: translateX(-50%);
     top: 0;
     align-items: center;
+    transform-origin: 50% 0%;
 }
 .pos-bottom-center {
     flex-direction: column-reverse;
@@ -242,6 +251,7 @@ body {
     transform: translateX(-50%);
     bottom: 0;
     align-items: center;
+    transform-origin: 50% 100%;
 }
 
 
@@ -265,7 +275,7 @@ body {
 .pos-bottom-right .entry-bg ,
 .pos-right .entry-bg {
     flex-direction: row-reverse;
-    translate: calc(100% - 100px);
+    translate: calc(100% - 100px * var(--var-scale));
     position: relative;
 }
 .pos-top-right .fire,
