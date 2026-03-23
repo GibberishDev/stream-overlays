@@ -282,13 +282,13 @@ function handleRepeats(words, emotes) {
             if (comboWords[word].timeout) clearTimeout(comboWords[word].timeout)
             if (comboWords[word].level == 3) {
                 comboWords[word].timeout = setTimeout(()=>{checkTimeouts(word)},registeredSettings.get("durationsuper").get())
-                updateWordHTML()
+                updateWordHTML(word)
             } else if (comboWords[word].level == 2) {
                 comboWords[word].timeout = setTimeout(()=>{checkTimeouts(word)},registeredSettings.get("durationmega").get())
-                updateWordHTML()
+                updateWordHTML(word)
             } else if (comboWords[word].level == 1) {
                 comboWords[word].timeout = setTimeout(()=>{checkTimeouts(word)},registeredSettings.get("durationregular").get())
-                updateWordHTML()
+                updateWordHTML(word)
             } else {
                 comboWords[word].timeout = setTimeout(()=>{checkTimeouts(word)},registeredSettings.get("durationregular").get())
             }
@@ -299,7 +299,7 @@ function handleRepeats(words, emotes) {
             if (comboWords[emote]) {
                 comboWords[emote].repetitions += 1
                 comboWords[emote].timestamp = new Date().getTime()
-                comboWords[emote].level = getLevel(comboWords[word].repetitions)
+                comboWords[emote].level = getLevel(comboWords[emote].repetitions)
             } else {
                 comboWords[emote] = {
                     "repetitions":1,
@@ -329,14 +329,20 @@ function handleRepeats(words, emotes) {
 function getLevel(repetitions) {
     var level = 0
     if (parseInt(registeredSettings.get("numberregular").get()) != 0 && repetitions > parseInt(registeredSettings.get("numberregular").get())) level = 1
-    if (parseInt(registeredSettings.get("numbermega").get()) != 0 && repetitions > parseInt(registeredSettings.get("numbermega").get())) level = 2
-    if (parseInt(registeredSettings.get("numbersuper").get()) != 0 && repetitions > parseInt(registeredSettings.get("numbersuper").get())) level = 3
+    if (parseInt(registeredSettings.get("numbermega").get()) != 0 && repetitions >= parseInt(registeredSettings.get("numbermega").get())) level = 2
+    if (parseInt(registeredSettings.get("numbersuper").get()) != 0 && repetitions >= parseInt(registeredSettings.get("numbersuper").get())) level = 3
     return level
 }
 
 function checkTimeouts(word) {
     if (comboWords[word] && comboWords[word].timestamp < new Date().getTime()) {
-        if (document.querySelector("[data-combo-id='"+comboWords[word].id+"']")) document.querySelector("[data-combo-id='"+comboWords[word].id+"']").remove()
+        let id = comboWords[word].id
+        if (document.querySelector("[data-id='"+id+"']")) {
+            setTimeout(()=> {
+                document.querySelector("[data-id='"+id+"']").remove()
+            }, 500) 
+            document.querySelector("[data-id='"+id+"']").classList.add("disappear")
+        }
         delete comboWords[word]
     } else {
         console.log("rogue timeout")
@@ -344,10 +350,104 @@ function checkTimeouts(word) {
 }
 
 function updateWordHTML(word) {
-    
+    if (comboWords[word].level == 0) return
+    let container = document.querySelector("#combo-wrapper")
+    var el = document.querySelector("[data-id='" + comboWords[word].id + "']")
+    if (el == undefined) {
+        el = document.createElement("div")
+        container.appendChild(el)
+        el.dataset.id = comboWords[word].id
+        el.innerHTML = `<div class="entry-bg"><div class="fire-stem"></div><div class="fire"></div></div><div class="entry"><div class="timer"></div><div class="word"></div><div class="counter"></div></div>`
+        for (let [i, letter] of Array.from(word).entries()) {
+            if (i + 1 < parseInt(registeredSettings.get("lettersnumber").get())) {
+                el.querySelector(".word").innerHTML += `<div class='letter' style='--delay:${i * 0.1}s'>${letter}</div>`
+            } else {
+                el.querySelector(".word").innerHTML += `<div class='letter' style='--delay:${i * 0.1}s'>…</div>`
+                break
+            }
+            i++
+        }
+    }
+    switch (comboWords[word].level) {
+        case 1 : {
+            el.className = 'entry-wrapper'
+            el.querySelector(".timer").style.setProperty("--duration", (parseInt(registeredSettings.get("durationregular").get())).toString() + "ms")
+            break
+        }
+        case 2 : {
+            el.className = 'entry-wrapper mega'
+            el.querySelector(".timer").style.setProperty("--duration", (parseInt(registeredSettings.get("durationmega").get())).toString() + "ms")
+            break
+        }
+        case 3 : {
+            el.className = 'entry-wrapper super'
+            el.querySelector(".timer").style.setProperty("--duration", (parseInt(registeredSettings.get("durationsuper").get())).toString() + "ms")
+            break
+        }
+        default : {
+            el.className = 'entry-wrapper'
+            el.querySelector(".timer").style.setProperty("--duration", (parseInt(registeredSettings.get("durationregular").get())).toString() + "ms")
+            break
+        }
+    }
+    el.querySelector(".counter").innerHTML = `<div class='letter'>X</div>`
+    for (let [i, letter] of Array.from(comboWords[word].repetitions.toString()).entries()) {
+        el.querySelector(".counter").innerHTML += `<div class='letter' style='--delay:${i * 0.1}s'>${letter}</div>`
+        i++
+    }
+    triggerReflow(el.querySelector(".timer"))
 }
 
 function updateEmoteHTML(emote) {
+    if (comboWords[emote].level == 0) return
+    let container = document.querySelector("#combo-wrapper")
+    var el = document.querySelector("[data-id='" + comboWords[emote].id + "']")
+    if (!el) {
+        el = document.createElement("div")
+        container.appendChild(el)
+        el.dataset.id = comboWords[emote].id
+        el.innerHTML = `<div class="entry-bg"><div class="fire-stem"></div><div class="fire"></div></div><div class="entry"><div class="timer"></div><div class="word"></div><div class="counter"></div></div>`
+        el.querySelector(".word").innerHTML = `<img class="letter" src="${getEmoteImageUrl(emote)}">`
+    }
+    switch (comboWords[emote].level) {
+        case 1 : {
+            el.className = 'entry-wrapper'
+            el.querySelector(".timer").style.setProperty("--duration", (parseInt(registeredSettings.get("durationregular").get())).toString() + "ms")
+            break
+        }
+        case 2 : {
+            el.className = 'entry-wrapper mega'
+            el.querySelector(".timer").style.setProperty("--duration", (parseInt(registeredSettings.get("durationmega").get())).toString() + "ms")
+            break
+        }
+        case 3 : {
+            el.className = 'entry-wrapper super'
+            el.querySelector(".timer").style.setProperty("--duration", (parseInt(registeredSettings.get("durationsuper").get())).toString() + "ms")
+            break
+        }
+        default : {
+            el.className = 'entry-wrapper'
+            el.querySelector(".timer").style.setProperty("--duration", (parseInt(registeredSettings.get("durationregular").get())).toString() + "ms")
+            break
+        }
+    }
+    el.querySelector(".counter").innerHTML = `<div class='letter'>X</div>`
+    for (let [i, letter] of Array.from(comboWords[emote].repetitions.toString()).entries()) {
+        el.querySelector(".counter").innerHTML += `<div class='letter' style='--delay:${i * 0.1}s'>${letter}</div>`
+        i++
+    }
+    triggerReflow(el.querySelector(".timer"))
     
+}
+
+/**
+* Trigger element styling reflow to restart animations and update css forsibly
+* 
+* @param {DOMElement} element - elements we want to reflow
+*/
+function triggerReflow(element) {
+    element.style.animation = 'none';
+    void element.offsetHeight;
+    element.style.animation = null;
 }
 start()

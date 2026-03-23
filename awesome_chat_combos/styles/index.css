@@ -52,6 +52,9 @@ body {
     width: min-content;
     display: flex;
 }
+.entry-wrapper.disappear {
+    animation: disappear 0.5s 0s linear forwards;
+}
 .entry {
     position: relative;
     font-family: boldpixels;
@@ -62,7 +65,7 @@ body {
     height: 24px;
     font-size: 24px;
     line-height: 24px;
-    -webkit-text-stroke: 1.5px black;
+    text-shadow: 0px 0px 2px black;
     color: var(--text-color);
     padding-left: 6px;
     padding-right: 6px;
@@ -72,10 +75,11 @@ body {
     display: var(--timer);
     --duration: 10000ms;
     background-image: conic-gradient(transparent, var(--time-left), var(--timer-color), var(--time-left), var(--timer-color));
-    height: 18px;
+    height: 14px;
     border: 2px solid black;
     aspect-ratio: 1;
     border-radius: 100%;
+    margin-top: 2px;
     animation: timer var(--duration) 0s linear 1 forwards;
     transition-duration: 200ms;
 }
@@ -97,6 +101,16 @@ body {
 @property --timer-color {
     syntax: '<color>';
     initial-value: rgba(255,255,255,0.5);
+    inherits: false;
+}
+@property --delay {
+    syntax: '<time>';
+    initial-value: 0s;
+    inherits: false;
+}
+@property --duration {
+    syntax: '<time>';
+    initial-value: 0s;
     inherits: false;
 }
 @keyframes shake {
@@ -132,12 +146,30 @@ body {
     80%  { color: hsl(288, 100%, 50%); }
     100%  { color: hsl(360, 100%, 50%); }
 }
+@keyframes timer {
+    0% {
+        --time-left: 0deg;
+        --timer-color: rgba(255,255,255,0.5);
+    }
+    50% {
+        --timer-color: rgba(255, 123, 0, 0.705);
+    }
+    100% {
+        --time-left: 360deg;
+        --timer-color: rgba(255,0,0,0.8);
+    }
+}
+@keyframes disappear {
+    0% {opacity: 1;}
+    100% {opacity: 0;}
+}
 
 .entry-wrapper.super .letter{
     animation: shake linear .2s infinite, color-shift-fire 1s linear infinite forwards;
 }
 .entry-wrapper.mega .letter{
-    animation: wave ease-in-out .5s infinite, color-shift-rainbow 1s linear infinite forwards;
+    --delay: 0s;
+    animation: wave ease-in-out .5s var(--delay) infinite, color-shift-rainbow 1s var(--delay) linear infinite forwards;
 }
 .entry-wrapper.super .entry-bg {
     width: 100%;
