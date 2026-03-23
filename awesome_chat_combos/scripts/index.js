@@ -187,9 +187,6 @@ let channels = []
 async function start() {
     if (client && typeof(client.disconnect) == 'function') {
         client.disconnect()
-        var notifId = uuidv4()
-        document.querySelector("#notification").innerHTML += "<div data-id='" + notifId + "'>Disonnected from chats</div>"
-        setTimeout(()=>{document.querySelectorAll("[data-id='" + notifId + "']").forEach((el)=>{el.remove()})}, 5000)
     }
     reload()
     initSettings()
@@ -359,7 +356,7 @@ function updateWordHTML(word) {
         el.dataset.id = comboWords[word].id
         el.innerHTML = `<div class="entry-bg"><div class="fire-stem"></div><div class="fire"></div></div><div class="entry"><div class="timer"></div><div class="word"></div><div class="counter"></div></div>`
         for (let [i, letter] of Array.from(word).entries()) {
-            if (i + 1 < parseInt(registeredSettings.get("lettersnumber").get())) {
+            if (i + 1 <= parseInt(registeredSettings.get("lettersnumber").get())) {
                 el.querySelector(".word").innerHTML += `<div class='letter' style='--delay:${i * 0.1}s'>${letter}</div>`
             } else {
                 el.querySelector(".word").innerHTML += `<div class='letter' style='--delay:${i * 0.1}s'>…</div>`

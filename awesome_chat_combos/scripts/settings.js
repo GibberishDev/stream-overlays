@@ -390,6 +390,7 @@ class HSV {
 function inputSaveSettings() {
     saveSettings()
     retrieveSettings()
+    document.querySelector("#combo-wrapper").innerHTML = ""
     document.querySelector("#settings-container").innerHTML = ""
     document.querySelector("#settings-wrapper").classList.add("hidden")
     document.querySelector("#content-preview").style.display = "none"
