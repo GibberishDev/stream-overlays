@@ -16,7 +16,7 @@ function uuidv4() {
 
 // #region settings
 new SettingArray("channelList", [], "Channels", "List of channels to track chat messages from")
-new SettingString("position","bottom-left","Position anchor","Defines position of the anchor for combos. Avaliable values: 'top-left','left','bottom-left','top-right','right','bottom-right'")
+new SettingString("position","bottom-left","Position anchor","Defines position of the anchor for combos. Avaliable values: 'top-left','left','bottom-left','top-center','center','bottom-center','top-right','right','bottom-right'")
 new SettingBool("showtimer", false, "Display timer", "Decides whether to show or hide combo expiration timer")
 new SettingBool("ffz", true, "Enable FFZ emotes", "Include FrankerFaceZ emotes in the set")
 new SettingBool("showcounter", true, "Display counter", "Decides whether to show or hide combo counter")
