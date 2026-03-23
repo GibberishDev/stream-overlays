@@ -81,10 +81,10 @@ body {
     --duration: 10000ms;
     background-image: conic-gradient(transparent, var(--time-left), var(--timer-color), var(--time-left), var(--timer-color));
     height: calc(14px * var(--var-scale));
-    border: 2px solid black;
+    border: calc(2px * var(--var-scale)) solid black;
     aspect-ratio: 1;
     border-radius: 100%;
-    margin-top: calc(2px * var(--var-scale));
+    margin-top: calc(3px * var(--var-scale));
     animation: timer var(--duration) 0s linear 1 forwards;
     transition-duration: 200ms;
 }

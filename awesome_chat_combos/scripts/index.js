@@ -18,7 +18,7 @@ function uuidv4() {
 new SettingArray("channelList", [], "Channels", "List of channels to track chat messages from")
 new SettingString("position","bottom-left","Position anchor","Defines position of the anchor for combos. Avaliable values: 'top-left','left','bottom-left','top-center','center','bottom-center','top-right','right','bottom-right'")
 new SettingBool("showtimer", false, "Display timer", "Decides whether to show or hide combo expiration timer")
-new SettingNumber("sizemult", 1.0, 0.1, null, 0.1, "Scale", "Controls scaling")
+new SettingNumber("sizemult", 1.0, 0.1, null, 0.1, "Scale", "Controls scaling. where 0.1 is smallest at 10% of base size and 2 is bigger and 200% of base size")
 new SettingBool("ffz", true, "Enable FFZ emotes", "Include FrankerFaceZ emotes in the set")
 new SettingBool("showcounter", true, "Display counter", "Decides whether to show or hide combo counter")
 new SettingBool("bttv", true, "Enable BTTV emotes", "Include BetterTTV emotes in the set")
