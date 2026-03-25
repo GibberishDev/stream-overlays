@@ -39,5 +39,6 @@ function reload() {
     for (let module of moduleIDS) {
         moduleStates.set(module, false)
     }
+    if (typeof(checkReadySounds) == 'function') checkReadySounds()
     readyCount = 0
 }

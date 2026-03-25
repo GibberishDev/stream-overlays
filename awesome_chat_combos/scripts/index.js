@@ -1,4 +1,12 @@
 // #region init
+
+setModuleList([
+    "settings",
+    "emotes",
+    "sounds",
+])
+
+
 // #region utils
 function triggerReflow(element) {
     element.style.animation = 'none';
@@ -13,6 +21,9 @@ function uuidv4() {
 }
 // #endregion
 
+new sfx("super_appear","./assets/super.mp3")
+new sfx("super_timeout","./assets/super_timeout.mp3")
+initSounds()
 
 // #region settings
 new SettingArray("channelList", [], "Channels", "List of channels to track chat messages from")
@@ -40,6 +51,7 @@ new SettingNumber("numbermega", 10, 0, null, 1,"Required repetitions: Mega", "Mi
 new SettingNumber("durationmega", 15000, 0, null, 100,"Duration: Mega", "Time in milliseconds until mega combo expires. Values below 2500 practically mean combo expires before twitch api sends information")
 new SettingNumber("numbersuper", 25, 0, null, 1,"Required repetitions: Super", "Minimum number of repeats in chat to display super combo animation. 0 means disabled")
 new SettingNumber("durationsuper", 20000, 0, null, 100,"Duration: Super", "Time in milliseconds until super combo expires. Values below 2500 practically mean combo expires before twitch api sends information")
+new SettingNumber("volume", 100, 0, 100, 1,"Sound effects volume", "Volume of sound effects. cool description")
 
 document.addEventListener("settingchanged",(ev)=>{
     switch (ev.id) {
@@ -176,11 +188,6 @@ document.addEventListener("settingchanged",(ev)=>{
     }
 })
 // #endregion
-
-setModuleList([
-    "settings",
-    "emotes",
-])
 document.addEventListener("moduleready",(ev)=>{
     if (ev.module == "emotes" && registeredSettings.get("displayemotes").get() == true) {
         var notifId = uuidv4()
@@ -294,7 +301,24 @@ function handleRepeats(words, emotes) {
             if (comboWords[word]) {
                 comboWords[word].repetitions += 1
                 comboWords[word].timestamp = new Date().getTime()
+                let lastLevel = comboWords[word].level
                 comboWords[word].level = getLevel(comboWords[word].repetitions)
+                if (lastLevel != comboWords[word].level) {
+                    switch (comboWords[word].level) {
+                        case 1 : {
+                            if (registeredSounds.get("regular_appear")) registeredSounds.get("regular_appear").play()
+                            break
+                        }
+                        case 2 : {
+                            if (registeredSounds.get("mega_appear")) registeredSounds.get("mega_appear").play()
+                            break
+                        }
+                        case 3 : {
+                            if (registeredSounds.get("super_appear")) registeredSounds.get("super_appear").play()
+                            break
+                        }
+                    }
+                }
             } else {
                 comboWords[word] = {
                     "repetitions":1,
@@ -324,7 +348,24 @@ function handleRepeats(words, emotes) {
             if (comboWords[emote]) {
                 comboWords[emote].repetitions += 1
                 comboWords[emote].timestamp = new Date().getTime()
+                let lastLevel = comboWords[emote].level
                 comboWords[emote].level = getLevel(comboWords[emote].repetitions)
+                if (lastLevel != comboWords[emote].level) {
+                    switch (comboWords[emote].level) {
+                        case 1 : {
+                            if (registeredSounds.get("regular_appear")) registeredSounds.get("regular_appear").play()
+                            break
+                        }
+                        case 2 : {
+                            if (registeredSounds.get("mega_appear")) registeredSounds.get("mega_appear").play()
+                            break
+                        }
+                        case 3 : {
+                            if (registeredSounds.get("super_appear")) registeredSounds.get("super_appear").play()
+                            break
+                        }
+                    }
+                }
             } else {
                 comboWords[emote] = {
                     "repetitions":1,
@@ -368,6 +409,23 @@ function checkTimeouts(word) {
             }, 500) 
             document.querySelector("[data-id='"+id+"']").classList.add("disappear")
         }
+        if (registeredSettings.get('volume').get() != 0) {
+            switch (comboWords[word].level) {
+                case 1 : {
+                    if (registeredSounds.get("regular_timeout")) registeredSounds.get("regular_timeout").play()
+                    break
+                }
+                case 2 : {
+                    if (registeredSounds.get("mega_timeout")) registeredSounds.get("mega_timeout").play()
+                    break
+                }
+                case 3 : {
+                    if (registeredSounds.get("super_timeout")) registeredSounds.get("super_timeout").play()
+                    break
+                }
+            }
+        }
+
         delete comboWords[word]
     } else {
         console.log("rogue timeout")

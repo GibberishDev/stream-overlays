@@ -72,7 +72,6 @@ async function fetchEmotes(channels,ffz=true,bttv=true,seventv=true) {
         }
     }
     if (typeof moduleReady === 'function') moduleReady("emotes")
-    console.log(twitchGlobalEmoteCodeToId, twitchChannelEmoteCodeToId, bttvEmoteCodeToId,ffzEmoteCodeToId,seventvEmoteCodeToId)
 }
 
 function getEmoteImageUrl(word) {
@@ -83,7 +82,6 @@ function getEmoteImageUrl(word) {
     }
     if (Object.keys(twitchChannelEmoteCodeToId).includes(word)) {
         id = twitchChannelEmoteCodeToId[word]
-        console.log(id)
         return `https://static-cdn.jtvnw.net/emoticons/v2/`+ id +`/default/dark/3.0`
     }
     if (Object.keys(bttvEmoteCodeToId).includes(word)) {
