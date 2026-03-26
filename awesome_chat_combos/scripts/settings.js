@@ -63,8 +63,9 @@ class SettingArray extends Setting {
     }
 }
 class SettingString extends Setting {
-    constructor (id, defaultValue, name="Unnamed setting", description="No description provided.") {
+    constructor (id, defaultValue, name="Unnamed setting", description="No description provided.", secure=false) {
         super (id, SETTING_TYPE.STRING, defaultValue, name, description)
+        this.secure = secure
     }
 }
 class SettingBool extends Setting {
@@ -153,6 +154,9 @@ function genSettingsMenu() {
                 el.querySelector(".setting-description").textContent = setting.description
                 el.querySelector(".input").value = setting.get()
                 el.querySelector(".input").placeholder = "Enter string value here"
+                if (setting.secure) {
+                    el.querySelector(".input").style.setProperty("-webkit-text-security","disc")
+                }
                 hookStringInput(el.querySelector(".input"), setting.id)
                 break
             }
@@ -165,6 +169,9 @@ function genSettingsMenu() {
                 el.querySelector(".setting-description").textContent = setting.description
                 el.querySelector(".input").value = Array.from(setting.get()).toString()
                 el.querySelector(".input").placeholder = "Enter comma separated values here"
+                if (setting.secure) {
+                    el.querySelector(".input").style.setProperty("-webkit-text-security","disc")
+                }
                 hookArrayInput(el.querySelector(".input"), setting.id)
                 break
             }
@@ -415,4 +422,18 @@ function inputResetSettings() {
     genSettingsMenu()
 }
 document.addEventListener("mousemove",()=>{triggerReflow(document.querySelector("#open-settings"))})
+// #endregion
+
+// #region settings menu layout
+
+var registeredCategories = new Map()
+
+class settignsCategory {
+    constructor(id, name="Category") {
+        this.id = id
+        this.name = name
+        registeredCategories.set(id, this)
+    }
+}
+
 // #endregion
