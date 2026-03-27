@@ -1,3 +1,5 @@
 tests/
 *.zip
 **notes.md
+now-playing/cover.png
+now-playing/data.json

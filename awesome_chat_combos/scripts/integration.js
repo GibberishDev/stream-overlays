@@ -4,7 +4,14 @@ const INTEGRATION_TYPE = Object.freeze({
 	FB: 2, //FireBot integration
 	MIU: 3, //MixItUp integration
 })
+const INTEGRATION_STATES = Object.freeze({
+	NONE: 0, //no integration active
+	READY: 1, //integration working and got responce if applicable from bot software
+	CONNECTING: 2, //integration is in process of connecting to bot software
+	FAILED: 3 //integration failed to connect to bot software
+})
 var activeIntegration = INTEGRATION_TYPE.NONE
+var integrationState = INTEGRATION_STATES.NONE
 
 function integrationConnect() {
 	switch (activeIntegration) {
@@ -12,7 +19,7 @@ function integrationConnect() {
 			return false
 		}
 		case INTEGRATION_TYPE.MIU : {
-			connectMIU(registeredSettings.get("miu_webhook_adress").get())
+			connectMIU()
 			break
 		}
 		case INTEGRATION_TYPE.SB : {
@@ -25,43 +32,61 @@ function integrationConnect() {
 let integrationEvents = new Map()
 
 function sendData(eventId,data={}) {
-	if (integrationEvents.get(eventId)) {
-		switch (integrationEvents.get(eventId).type) {
-			case INTEGRATION_TYPE.SB : {
+	switch (activeIntegration) {
+		case INTEGRATION_TYPE.SB : {
+			if (integrationEvents.get(eventId)) {
 				doSBAction(eventId, data)
-				break
 			}
-			case INTEGRATION_TYPE.MIU : {
-				doSBAction(eventId, data)
-				break
-			}
+			break
+		}
+		case INTEGRATION_TYPE.MIU : {
+			doMIUCommand(eventId, data)
+			break
 		}
 	}
+}
+function eventIntegrationReady() {
+	moduleReady("integration")
 }
 
 
 // #region mixitup
 
-var mixItUpWebhook = ''
+var miu_command
 
-function connectMIU(webhookAdress) {
-	mixItUpWebhook = webhookAdress
-	fetch(mixItUpWebhook, {
-		method: "POST",
-		headers: {
+async function connectMIU() {
+	let commands = await fetch("http://localhost:8911/api/v2/commands").then((responce)=>responce.json()).then((obj)=>{return obj["Commands"]})
+	for (let i in commands) {
+		let command = commands[i]
+		if (command.GroupName == "ACC") {
+			miu_command = command
+		}
+	}
+	if (miu_command) {
+		console.log("miu connected")
+	} else {
+		console.log("fuck you")
+	}
+}
+
+function doMIUCommand(id,data) {
+	switch (id) {
+		case "combo_achieved_regular" : data.accEventType = "achievedRegular"; break
+		case "combo_achieved_mega" : data.accEventType = "achievedMega"; break
+		case "combo_achieved_super" : data.accEventType = "achievedSuper"; break
+		case "combo_expired_regular" : data.accEventType = "expiredRegular"; break
+		case "combo_expired_mega" : data.accEventType = "expiredMega"; break
+		case "combo_expired_super" : data.accEventType = "expiredSuper"; break
+		case "combo_expired" : data.accEventType = "expired"; break
+		case "integration_connected" : data.accEventType = "connected"; break
+	}
+	fetch("http://localhost:8911/api/v2/commands/" + miu_command.ID,{
+		"method": "POST",
+		"headers": {
 			"Content-Type": "application/json"
 		},
-		body: JSON.stringify({
-			ACComboType: "connect",
-			id: uuidv4(),
-			reason: null,
-			timestamp: new Date().getTime(),
-			ACComboAmount: null,
-			ACComboWord: null,
-			ACComboIsEmote: null,
-			ACComboEmoteURL: null
-		})
-	}).then((responce)=>console.log(responce)).catch((err)=>console.error(err))
+		"body": JSON.stringify({"SpecialIdentifiers":data})
+	})
 }
 // #endregion
 

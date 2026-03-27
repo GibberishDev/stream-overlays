@@ -194,6 +194,10 @@ document.addEventListener("settingchanged",(ev)=>{
 					activeIntegration = INTEGRATION_TYPE.SB
 					break
 				}
+				case "mixitup" : {
+					activeIntegration = INTEGRATION_TYPE.MIU
+					break
+				}
 				default : {
 					activeIntegration = INTEGRATION_TYPE.NONE
 					break
@@ -311,17 +315,17 @@ function handleRepeats(words, emotes) {
 					switch (comboWords[word].level) {
 						case 1 : {
 							if (registeredSounds.get("regular_appear")) registeredSounds.get("regular_appear").play()
-							sendData("combo_achieved_regular",{"word":word,"repetitions":comboWords[word].repetitions,"timestamp":new Date().getTime(),"level":comboWords[word].level, "isEmote": false, "emoteURL": ''})
+							sendData("combo_achieved_regular",{"word":word,"repetitions":comboWords[word].repetitions.toString(),"timestamp":(new Date().getTime()).toString(),"level":comboWords[word].level.toString(), "isEmote": false.toString(), "emoteURL": ''})
 							break
 						}
 						case 2 : {
 							if (registeredSounds.get("mega_appear")) registeredSounds.get("mega_appear").play()
-							sendData("combo_achieved_regular",{"word":word,"repetitions":comboWords[word].repetitions,"timestamp":new Date().getTime(),"level":comboWords[word].level, "isEmote": false, "emoteURL": ''})
+							sendData("combo_achieved_regular",{"word":word,"repetitions":comboWords[word].repetitions.toString(),"timestamp":(new Date().getTime()).toString(),"level":comboWords[word].level.toString(), "isEmote": false.toString(), "emoteURL": ''})
 							break
 						}
 						case 3 : {
 							if (registeredSounds.get("super_appear")) registeredSounds.get("super_appear").play()
-							sendData("combo_achieved_regular",{"word":word,"repetitions":comboWords[word].repetitions,"timestamp":new Date().getTime(),"level":comboWords[word].level, "isEmote": false, "emoteURL": ''})
+							sendData("combo_achieved_regular",{"word":word,"repetitions":comboWords[word].repetitions.toString(),"timestamp":(new Date().getTime()).toString(),"level":comboWords[word].level.toString(), "isEmote": false.toString(), "emoteURL": ''})
 							break
 						}
 					}
