@@ -426,6 +426,7 @@ document.addEventListener("mousemove",()=>{triggerReflow(document.querySelector(
 
 // #region settings menu layout
 
+var registeredLayouts = new Map()
 var registeredCategories = new Map()
 
 class settignsCategory {
@@ -433,6 +434,14 @@ class settignsCategory {
         this.id = id
         this.name = name
         registeredCategories.set(id, this)
+    }
+}
+
+class settingsLayout {
+    constructor(id, categories=[]) {
+        this.id = id
+        this.categories = categories
+        registeredLayouts.set(id,this)
     }
 }
 
