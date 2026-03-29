@@ -29,12 +29,10 @@ function integrationConnect() {
 	}
 }
 
-let integrationEvents = new Map()
-
 function sendData(eventId,data={}) {
 	switch (activeIntegration) {
 		case INTEGRATION_TYPE.SB : {
-			if (integrationEvents.get(eventId)) {
+			if (streamerbotActions.get(eventId)) {
 				doSBAction(eventId, data)
 			}
 			break
@@ -92,6 +90,7 @@ function doMIUCommand(id,data) {
 
 // #region streamerbot
 
+let streamerbotActions = new Map()
 var ws = undefined
 var sbPort
 var sbPassword
@@ -165,14 +164,14 @@ async function onMessageSB(message) {
 			if (action.group == "ACC") {
 				switch (action.name) {
 					case "combo achieved - regular" : {
-						integrationEvents.set("combo_achieved_regular", {
+						streamerbotActions.set("combo_achieved_regular", {
 							type: INTEGRATION_TYPE.SB,
 							action: action
 						})
 						break
 					}
 					case "combo achieved - mega" : {
-						integrationEvents.set("combo_achieved_mega", {
+						streamerbotActions.set("combo_achieved_mega", {
 							type: INTEGRATION_TYPE.SB,
 							action: action
 						})
@@ -180,7 +179,7 @@ async function onMessageSB(message) {
 						break
 					}
 					case "combo achieved - super" : {
-						integrationEvents.set("combo_achieved_super", {
+						streamerbotActions.set("combo_achieved_super", {
 							type: INTEGRATION_TYPE.SB,
 							action: action
 						})
@@ -188,7 +187,7 @@ async function onMessageSB(message) {
 						break
 					}
 					case "combo expired" : {
-						integrationEvents.set("combo_expired", {
+						streamerbotActions.set("combo_expired", {
 							type: INTEGRATION_TYPE.SB,
 							action: action
 						})
@@ -196,28 +195,28 @@ async function onMessageSB(message) {
 						break
 					}
 					case "combo expired - regular" : {
-						integrationEvents.set("combo_expired_regular", {
+						streamerbotActions.set("combo_expired_regular", {
 							type: INTEGRATION_TYPE.SB,
 							action: action
 						})
 						break
 					}
 					case "combo expired - mega" : {
-						integrationEvents.set("combo_expired_mega", {
+						streamerbotActions.set("combo_expired_mega", {
 							type: INTEGRATION_TYPE.SB,
 							action: action
 						})
 						break
 					}
 					case "combo expired - super" : {
-						integrationEvents.set("combo_expired_super", {
+						streamerbotActions.set("combo_expired_super", {
 							type: INTEGRATION_TYPE.SB,
 							action: action
 						})
 						break
 					}
 					case "overlay connected" : {
-						integrationEvents.set("integration_connected", {
+						streamerbotActions.set("integration_connected", {
 							type: INTEGRATION_TYPE.SB,
 							action: action
 						})
@@ -226,12 +225,12 @@ async function onMessageSB(message) {
 				}
 			}
 		}
-		if (integrationEvents.get("integration_connected")) sendData("integration_connected")
+		if (streamerbotActions.get("integration_connected")) sendData("integration_connected")
 	}
 }
 
 function doSBAction(actionId, args) {
-	let action = integrationEvents.get(actionId).action
+	let action = streamerbotActions.get(actionId).action
 	let obj = JSON.stringify({
 		"id": uuidv4(),
 		"request": "DoAction",

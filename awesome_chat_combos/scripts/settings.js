@@ -430,18 +430,22 @@ var registeredLayouts = new Map()
 var registeredCategories = new Map()
 
 class settignsCategory {
-    constructor(id, name="Category") {
+    constructor(id,expanded=true, name="Category") {
         this.id = id
         this.name = name
+        this.expanded = expanded
         registeredCategories.set(id, this)
     }
 }
 
 class settingsLayout {
-    constructor(id, categories=[]) {
+    constructor(id, categories={}) {
         this.id = id
         this.categories = categories
         registeredLayouts.set(id,this)
+    }
+    expandCategory(id) {
+        this.categories[id].expand()
     }
 }
 
