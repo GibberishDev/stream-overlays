@@ -4,6 +4,7 @@ setModuleList([
 	"settings",
 	"emotes",
 	"sounds",
+	"integration"
 ])
 
 
@@ -198,6 +199,10 @@ document.addEventListener("settingchanged",(ev)=>{
 					activeIntegration = INTEGRATION_TYPE.MIU
 					break
 				}
+				case "firebot" : {
+					activeIntegration = INTEGRATION_TYPE.FB
+					break
+				}
 				default : {
 					activeIntegration = INTEGRATION_TYPE.NONE
 					break
@@ -213,6 +218,28 @@ document.addEventListener("moduleready",(ev)=>{
 		postNotification("Loaded emotes for channels: " + channels.toString())
 		postNotification("Total emotes loaded: " + (Object.keys(bttvEmoteCodeToId).length + Object.keys(ffzEmoteCodeToId).length + Object.keys(seventvEmoteCodeToId).length + Object.keys(twitchGlobalEmoteCodeToId).length + Object.keys(twitchChannelEmoteCodeToId).length))
 	}
+	if (ev.module == "integration") {
+		var integrationName
+		switch (activeIntegration) {
+			case INTEGRATION_TYPE.NONE : {
+				return
+			}
+			case INTEGRATION_TYPE.FB : {
+				integrationName = "Firebot"
+				break
+			}
+			case INTEGRATION_TYPE.SB : {
+				integrationName = "Streamer.Bot"
+				break
+			}
+			case INTEGRATION_TYPE.MIU : {
+				integrationName = "MixItUp"
+				break
+			}
+		}
+		postNotification("Connected to bot integration: " + integrationName)
+		sendData("integration_connected")
+	}
 })
 document.addEventListener("allmodulesready",async ()=>{
 	client = new tmi.Client({
@@ -227,7 +254,6 @@ document.addEventListener("allmodulesready",async ()=>{
 	
 	postNotification("Connected to chats: " + channels.toString())
 })
-document.addEventListener("sb_authenticated",()=>postNotification("Streamer.Bot autheticated"))
 // #endregion
 var client = null
 let channels = []
@@ -267,6 +293,8 @@ async function start() {
 	)
 	if (activeIntegration != INTEGRATION_TYPE.NONE) {
 		integrationConnect()
+	} else {
+		moduleReady("integration")
 	}
 }
 
@@ -582,4 +610,3 @@ function postNotification(html) {
 	el.dataset.id = id
 	document.querySelector("#notification").appendChild(el)
 }
-postNotification(document.URL)

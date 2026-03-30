@@ -23,7 +23,11 @@ function integrationConnect() {
 			break
 		}
 		case INTEGRATION_TYPE.SB : {
-			connectSB(registeredSettings.get("sb_port").get(),registeredSettings.get("sb_password").get())
+			connectSB()
+			break
+		}
+		case INTEGRATION_TYPE.FB : {
+			connectFB()
 			break
 		}
 	}
@@ -39,6 +43,10 @@ function sendData(eventId,data={}) {
 		}
 		case INTEGRATION_TYPE.MIU : {
 			doMIUCommand(eventId, data)
+			break
+		}
+		case INTEGRATION_TYPE.FB : {
+			doFBCommand(eventId, data)
 			break
 		}
 	}
@@ -61,9 +69,7 @@ async function connectMIU() {
 		}
 	}
 	if (miu_command) {
-		console.log("miu connected")
-	} else {
-		console.log("fuck you")
+		eventIntegrationReady()
 	}
 }
 
@@ -225,7 +231,10 @@ async function onMessageSB(message) {
 				}
 			}
 		}
-		if (streamerbotActions.get("integration_connected")) sendData("integration_connected")
+		if (streamerbotActions.get("integration_connected")) {
+			sendData("integration_connected")
+			eventIntegrationReady()
+		}
 	}
 }
 
@@ -242,4 +251,47 @@ function doSBAction(actionId, args) {
 	})
 	ws.send(obj)
 }
+// #endregion
+
+// #region firebot
+
+var fb_effectListID = ""
+
+async function connectFB() {
+	let effectLists = await fetch(
+		"http://localhost:7472/api/v1/effects/preset",
+		{
+			method:"GET",
+			"headers":{"Content-Type": "application/json"}
+		}
+	).then((resp)=>resp.json())
+	for (let effectList of effectLists) {
+		if (effectList.name == "ACC") {
+			fb_effectListID = effectList.id
+			break
+		}
+	}
+	if (fb_effectListID) eventIntegrationReady()
+}
+
+function doFBCommand(id,data) {
+	switch (id) {
+		case "combo_achieved_regular" : data.accEventType = "achievedRegular"; break
+		case "combo_achieved_mega" : data.accEventType = "achievedMega"; break
+		case "combo_achieved_super" : data.accEventType = "achievedSuper"; break
+		case "combo_expired_regular" : data.accEventType = "expiredRegular"; break
+		case "combo_expired_mega" : data.accEventType = "expiredMega"; break
+		case "combo_expired_super" : data.accEventType = "expiredSuper"; break
+		case "combo_expired" : data.accEventType = "expired"; break
+		case "integration_connected" : data.accEventType = "connected"; break
+	}
+	fetch(`http://localhost:7472/api/v1/effects/preset/${fb_effectListID}/run`,{
+		"method": "POST",
+		"headers": {
+			"Content-Type": "application/json"
+		},
+		"body": JSON.stringify({"args":data})
+	})
+}
+
 // #endregion
