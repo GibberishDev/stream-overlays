@@ -54,7 +54,9 @@ new SettingNumber("numbersuper", 25, 0, null, 1,"Required repetitions: Super", "
 new SettingNumber("durationsuper", 20000, 0, null, 100,"Duration: Super", "Time in milliseconds until super combo expires. Values below 2500 practically mean combo expires before twitch api sends information")
 new SettingNumber("volume", 100, 0, 100, 1,"Sound effects volume", "Volume of sound effects. cool description")
 new SettingString("integrationtype", "none","Bot integration type", "Allows sending events to chat bots. Avaliable values are: none, streamerbot, mixitup, firebot")
+new SettingString("sb_ip", "127.0.0.1","Streamerbot websocket ip", "In case you set up custom websocket server ip enter it here", true)
 new SettingNumber("sb_port", 8080, 0, 655353, 1,"Streamerbot websocket port", "Port number of streamer.bot websocket server. default is 8080")
+new SettingString("sb_endpoint", "/", "Streamerbot websocket endpoint", "In case you set up custom endpoint for websocket server enter it here")
 new SettingString("sb_password", "","Streamerbot websocket password", "In case you set up connection password enter it here", true)
 
 document.addEventListener("settingchanged",(ev)=>{
@@ -217,28 +219,6 @@ document.addEventListener("moduleready",(ev)=>{
 	if (ev.module == "emotes" && registeredSettings.get("displayemotes").get() == true) {
 		postNotification("Loaded emotes for channels: " + channels.toString())
 		postNotification("Total emotes loaded: " + (Object.keys(bttvEmoteCodeToId).length + Object.keys(ffzEmoteCodeToId).length + Object.keys(seventvEmoteCodeToId).length + Object.keys(twitchGlobalEmoteCodeToId).length + Object.keys(twitchChannelEmoteCodeToId).length))
-	}
-	if (ev.module == "integration") {
-		var integrationName
-		switch (activeIntegration) {
-			case INTEGRATION_TYPE.NONE : {
-				return
-			}
-			case INTEGRATION_TYPE.FB : {
-				integrationName = "Firebot"
-				break
-			}
-			case INTEGRATION_TYPE.SB : {
-				integrationName = "Streamer.Bot"
-				break
-			}
-			case INTEGRATION_TYPE.MIU : {
-				integrationName = "MixItUp"
-				break
-			}
-		}
-		postNotification("Connected to bot integration: " + integrationName)
-		sendData("integration_connected")
 	}
 })
 document.addEventListener("allmodulesready",async ()=>{

@@ -4,14 +4,7 @@ const INTEGRATION_TYPE = Object.freeze({
 	FB: 2, //FireBot integration
 	MIU: 3, //MixItUp integration
 })
-const INTEGRATION_STATES = Object.freeze({
-	NONE: 0, //no integration active
-	READY: 1, //integration working and got responce if applicable from bot software
-	CONNECTING: 2, //integration is in process of connecting to bot software
-	FAILED: 3 //integration failed to connect to bot software
-})
 var activeIntegration = INTEGRATION_TYPE.NONE
-var integrationState = INTEGRATION_STATES.NONE
 
 function integrationConnect() {
 	switch (activeIntegration) {
@@ -53,15 +46,42 @@ function sendData(eventId,data={}) {
 }
 function eventIntegrationReady() {
 	moduleReady("integration")
+	var integrationName
+	switch (activeIntegration) {
+		case INTEGRATION_TYPE.NONE : {
+			return
+		}
+		case INTEGRATION_TYPE.FB : {
+			integrationName = "Firebot"
+			break
+		}
+		case INTEGRATION_TYPE.SB : {
+			integrationName = "Streamer.Bot"
+			break
+		}
+		case INTEGRATION_TYPE.MIU : {
+			integrationName = "MixItUp"
+			break
+		}
+	}
+	postNotification("Connected to bot integration: " + integrationName)
+	sendData("integration_connected")
 }
+function eventIntegrationFail() {
+	postNotification("<span style='color:red;font-weight:bold;'>Failed to connect to chatbot integration. Continuing without integration...</span>")
+	moduleReady("integration")
 
+}
 
 // #region mixitup
 
 var miu_command
 
 async function connectMIU() {
-	let commands = await fetch("http://localhost:8911/api/v2/commands").then((responce)=>responce.json()).then((obj)=>{return obj["Commands"]})
+	let commands = await fetch("http://localhost:8911/api/v2/commands").then((responce)=>responce.json()).then((obj)=>{return obj["Commands"]}).catch((err)=>{
+		eventIntegrationFail()
+		return
+	})
 	for (let i in commands) {
 		let command = commands[i]
 		if (command.GroupName == "ACC") {
@@ -101,13 +121,14 @@ var ws = undefined
 var sbPort
 var sbPassword
 var sbAwaitAuth = false
+var sbAwaitGreet = false
 
-function connectSB(port, password="") {
-	sbPort = port
-	sbPassword = password
-	ws = new WebSocket("ws://127.0.0.1:"+port)
-
+function connectSB() {
+	let url = "ws://" + (registeredSettings.get("sb_ip").get()).toString() + ":" + (registeredSettings.get("sb_port").get()).toString() + (registeredSettings.get("sb_endpoint").get()).toString()
+	ws = new WebSocket(url)
 	ws.onmessage = onMessageSB
+	sbAwaitGreet = true
+	setTimeout(sbGreetingFail,3000)
 }
 
 async function sha256Base64(input) {
@@ -120,6 +141,12 @@ async function sha256Base64(input) {
 	let binary = "";
 	bytes.forEach(b => binary += String.fromCharCode(b));
 	return btoa(binary);
+}
+
+function sbGreetingFail() {
+	if (sbAwaitGreet) {
+		eventIntegrationFail()
+	}
 }
 
 async function authenticate(ws, data, password) {
@@ -148,6 +175,7 @@ function getSBActions() {
 async function onMessageSB(message) {
 	const data = await JSON.parse(message.data)
 	if (data.request && data.request == "Hello") {
+		sbAwaitGreet = false
 		if (data.authentication) {
 			await authenticate(ws, data, sbPassword)
 			return
@@ -264,14 +292,19 @@ async function connectFB() {
 			method:"GET",
 			"headers":{"Content-Type": "application/json"}
 		}
-	).then((resp)=>resp.json())
-	for (let effectList of effectLists) {
-		if (effectList.name == "ACC") {
-			fb_effectListID = effectList.id
-			break
+	).then((resp)=>resp.json()).catch((err)=>{
+		eventIntegrationFail()
+		return
+	})
+	if (effectLists) {
+		for (let effectList of effectLists) {
+			if (effectList.name == "ACC") {
+				fb_effectListID = effectList.id
+				break
+			}
 		}
+		if (fb_effectListID) eventIntegrationReady()
 	}
-	if (fb_effectListID) eventIntegrationReady()
 }
 
 function doFBCommand(id,data) {
