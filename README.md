@@ -4,4 +4,4 @@ Some overlays require outside OBS plugins or Firebot setup (streamerbot esk prog
 
 ### [Awesome chat combos - v1.1](./awesome_chat_combos)
 Standalone overlay that anonymously connects to twitch chats and counts repeated words and emotes.<br>
-![alt text](awesome_chat_combos/previews/combos.png)<br>![alt text](awesome_chat_combos/previews/settings.png)
+![alt text](awesome_chat_combos/previews/combos.png)<br>![alt text](awesome_chat_combos/previews/new_settings.png)

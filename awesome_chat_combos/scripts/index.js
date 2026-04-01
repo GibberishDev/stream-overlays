@@ -63,6 +63,8 @@ new SettingString("sb_endpoint", "/", "Streamerbot websocket endpoint", "In case
 new SettingString("sb_password", "","Streamerbot websocket password", "In case you set up connection password enter it here", true)
 // #endregion
 // #region settings menu layout
+new LayoutText(new LayoutCondition("always"),"Awesome Chat Combos","Thank you for using ACC overlay. Made by GibbDev. Version 1.1",true)
+
 new LayoutCategory(new LayoutCondition("always"),[
 	new LayoutSetting(new LayoutCondition("always"), "channelList", true, true),
 	new LayoutSetting(new LayoutCondition("always"), "numberregular", false, true),
@@ -248,7 +250,7 @@ document.addEventListener("allmodulesready",async ()=>{
 	
 	postNotification("Connected to chats: " + channels.toString())
 })
-// #endregion
+
 var client = null
 let channels = []
 async function start() {
