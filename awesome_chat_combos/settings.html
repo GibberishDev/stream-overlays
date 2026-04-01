@@ -6,106 +6,23 @@
     <title>Document</title>
     <link rel="stylesheet" href="styles/index.css">
     <link rel="stylesheet" href="styles/settings2.css">
+    <script src="./scripts/utils.js"></script>
+    <script src="./scripts/settings.js"></script>
 </head>
 <body>
-    <div id="settings">
+    <button tabindex='-1'  id="open-settings" onclick="showSettingsMenu()">OPEN SETTINGS</button>
+    <div id="settings" style="display: none;">
         <div id="settings-wrapper">
             <div id="settings-label">SETTINGS</div>
             <div id="settings-container">
-                <div class="setting string">
-                    <div class="setting-label">Title</div>
-                    <div class="setting-description">List of channels to track chat messages from</div>
-                    <input type="text" placeholder="Input text here">
-                </div>
-                <div class="settings-category">
-                    <div class="settings-category-label">Display</div>
-                    <div class="settings-category-container">
-                        <div class="setting button wide">
-                            <div class="setting-label">Title</div>
-                            <div class="setting-description">Description Lorem ipsum, dolor sit amet consectetur adipisicing elit. Iusto, voluptatem tempora nemo perferendis excepturi ullam adipisci at! Adipisci distinctio autem ullam repellendus, minus excepturi perspiciatis eligendi esse, minima, hic cum?</div>
-                            <button>button text</button>
-                        </div>
-                        <div class="setting checkbox">
-                            <div class="setting-label">Display emotes</div>
-                            <div class="setting-description">Decides whether to replace text with emotes</div>
-                            <div class="checkbox-container">
-                                <input type="checkbox" checked>
-                                <div class="checkbox-vis"></div>
-                            </div>
-                        </div>
-                        <div class="setting checkbox">
-                            <div class="setting-label">Enable 7TV emotes</div>
-                            <div class="setting-description">Include 7TV emotes in the set</div>
-                            <div class="checkbox-container">
-                                <input type="checkbox" checked>
-                                <div class="checkbox-vis"></div>
-                            </div>
-                        </div>
-                        <div class="setting spacer"></div>
-                        <div class="setting checkbox">
-                            <div class="setting-label">Enable FFZ emotes</div>
-                            <div class="setting-description">Include FrankerFaceZ emotes in the set</div>
-                            <div class="checkbox-container">
-                                <input type="checkbox">
-                                <div class="checkbox-vis"></div>
-                            </div>
-                        </div>
-                        <div class="setting spacer"></div>
-                        <div class="setting checkbox inactive">
-                            <div class="setting-label">Enable BTTV emotes</div>
-                            <div class="setting-description">Include BetterTTV emotes in the set</div>
-                            <div class="checkbox-container">
-                                <input type="checkbox" checked>
-                                <div class="checkbox-vis"></div>
-                            </div>
-                        </div>
-                        <div class="setting string wide">
-                            <div class="setting-label">Title</div>
-                            <div class="setting-description">Description Lorem ipsum, dolor sit amet consectetur adipisicing elit. Iusto, voluptatem tempora nemo perferendis excepturi ullam adipisci at! Adipisci distinctio autem ullam repellendus, minus excepturi perspiciatis eligendi esse, minima, hic cum?</div>
-                            <input type="text" placeholder="Input text here">
-                        </div>
-                        <div class="setting color">
-                            <div class="setting-label">Color</div>
-                            <div class="setting-description">Text color</div>
-                            <div class="color-container">
-                                <div class="color-preview"></div>
-                                <div class="slider hue" data-value="0">
-                                    <div class="grabber"></div>
-                                </div>
-                                <div class="slider sat" data-value="0">
-                                    <div class="grabber"></div>
-                                </div>
-                                <div class="slider val" data-value="0">
-                                    <div class="grabber"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="setting dropdown open">
-                            <div class="setting-label">Dropdown setting</div>
-                            <div class="setting-description">test setting for drowdlown functionality</div>
-                            <div class="dropdown-input">
-                                <div class="dropdown-label">Option 1</div>
-                                <div class="dropdown-vis"><</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="settings-category collapsed">
-                    <div class="settings-category-label">Filters</div>
-                    <div class="settings-category-container"></div>
-                </div>
-                <div class="settings-category collapsed">
-                    <div class="settings-category-label">Integration</div>
-                    <div class="settings-category-container"></div>
-                </div>
             </div>
             <div id="settings-controls">
-                <button tabindex='-1' class="settings-button">SAVE</button>
-                <button tabindex='-1' class="settings-button">CANCEL</button>
-                <button tabindex='-1' class="settings-button">RESET</button>
+                <button tabindex='-1' class="settings-button" onclick="inputSaveSettings()">SAVE</button>
+                <button tabindex='-1' class="settings-button" onclick="inputCancelSettings()">CANCEL</button>
+                <button tabindex='-1' class="settings-button" onclick="inputResetSettings()">RESET</button>
             </div>
         </div>
-        <div class="dropdown-wrapper">
+        <div id="dropdown-wrapper" style="display: none;">
             <div class="dropdown-list">
                 <div class="dropdown-option">Option 1</div>
                 <div class="dropdown-option">Option 2</div>
@@ -115,5 +32,93 @@
         <div id="settings-bg"><div id="settings-bg-crt"><div id="settings-bg-scanline"></div></div></div>
         
     </div>
+    <script>
+    </script>
 </body>
 </html>
+<!-- 
+checklist:
+[ ] loading settings object
+
+
+
+<div class="setting spacer"></div>
+<div class="setting button">
+    <div class="setting-label"></div>
+    <div class="setting-description"></div>
+    <button></button>
+</div>
+
+
+
+
+</div>
+<div class="settings-category">
+    <div class="settings-category-label"></div>
+    <div class="settings-category-container"></div>
+</div>
+        <div class="setting checkbox">
+        </div>
+        <div class="setting checkbox">
+            <div class="setting-label">Enable 7TV emotes</div>
+            <div class="setting-description">Include 7TV emotes in the set</div>
+            <div class="checkbox-container">
+                <input type="checkbox" checked>
+                <div class="checkbox-vis"></div>
+            </div>
+        </div>
+        <div class="setting spacer"></div>
+        <div class="setting checkbox">
+            <div class="setting-label">Enable FFZ emotes</div>
+            <div class="setting-description">Include FrankerFaceZ emotes in the set</div>
+            <div class="checkbox-container">
+                <input type="checkbox">
+                <div class="checkbox-vis"></div>
+            </div>
+        </div>
+        <div class="setting checkbox inactive">
+            <div class="setting-label">Enable BTTV emotes</div>
+            <div class="setting-description">Include BetterTTV emotes in the set</div>
+            <div class="checkbox-container">
+                <input type="checkbox" checked>
+                <div class="checkbox-vis"></div>
+            </div>
+        </div>
+        <div class="setting string wide">
+            <div class="setting-label">Title</div>
+            <div class="setting-description">Description Lorem ipsum, dolor sit amet consectetur adipisicing elit. Iusto, voluptatem tempora nemo perferendis excepturi ullam adipisci at! Adipisci distinctio autem ullam repellendus, minus excepturi perspiciatis eligendi esse, minima, hic cum?</div>
+            <input type="text" placeholder="Input text here">
+        </div>
+        <div class="setting color">
+            <div class="setting-label">Color</div>
+            <div class="setting-description">Text color</div>
+            <div class="color-container">
+                <div class="color-preview"></div>
+                <div class="slider hue" data-value="0">
+                    <div class="grabber"></div>
+                </div>
+                <div class="slider sat" data-value="0">
+                    <div class="grabber"></div>
+                </div>
+                <div class="slider val" data-value="0">
+                    <div class="grabber"></div>
+                </div>
+            </div>
+        </div>
+        <div class="setting dropdown open">
+            <div class="setting-label">Dropdown setting</div>
+            <div class="setting-description">test setting for drowdown functionality</div>
+            <div class="dropdown-input">
+                <div class="dropdown-label">Option 1</div>
+                <div class="dropdown-vis"><</div>
+            </div>
+        </div>
+<div class="settings-category collapsed">
+    <div class="settings-category-label">Filters</div>
+    <div class="settings-category-container"></div>
+</div>
+<div class="settings-category collapsed">
+    <div class="settings-category-label">Integration</div>
+    <div class="settings-category-container"></div>
+</div>
+-->

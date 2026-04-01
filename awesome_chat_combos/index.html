@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 <!-- #region scripts -->
+<script src="./scripts/utils.js"></script>
 <script src="./scripts/tmi.js"></script>
 <script src="./scripts/emotes.js"></script>
 <script src="./scripts/ready.js"></script>
@@ -21,90 +22,29 @@
 <!-- #endregion -->
  <!-- #region html defenitions-->
 <body>
-    <input id="open-settings" type="button" value="Open settings" onclick="genSettingsMenu()">
-    <div id="settings-wrapper" class="hidden">
-        <div id="settings-title">Settings</div>
-        <div id="settings-container"></div>
-        <div id="settings-controls">
-            <input type="button" value="Save" onclick="inputSaveSettings()">
-            <input type="button" value="Cancel" onclick="inputCancelSettigns()">
-            <input type="button" value="Reset" onclick="inputResetSettings()">
+    <button tabindex='-1'  id="open-settings" onclick="showSettingsMenu()">OPEN SETTINGS</button>
+    <div id="settings" style="display: none;">
+        <div id="settings-wrapper">
+            <div id="settings-label">SETTINGS</div>
+            <div id="settings-container">
+            </div>
+            <div id="settings-controls">
+                <button tabindex='-1' class="settings-button" onclick="inputSaveSettings()">SAVE</button>
+                <button tabindex='-1' class="settings-button" onclick="inputCancelSettings()">CANCEL</button>
+                <button tabindex='-1' class="settings-button" onclick="inputResetSettings()">RESET</button>
+            </div>
         </div>
+        <div id="dropdown-wrapper" style="display: none;">
+            <div class="dropdown-list">
+                <div class="dropdown-option">Option 1</div>
+                <div class="dropdown-option">Option 2</div>
+                <div class="dropdown-option">Option 3</div>
+            </div>
+        </div>
+        <div id="settings-bg"><div id="settings-bg-crt"><div id="settings-bg-scanline"></div></div></div>
+        
     </div>
     <div id="combo-wrapper" class="combo-wrapper pos-bottom-left"></div>
-    <div id="content-preview" class="combo-wrapper pos-bottom-center" style="display: none;">
-        <div id="preview-entry-super" class="entry-wrapper super">
-            <div class="entry-bg">
-                <div class="fire-stem"></div>
-                <div class="fire"></div>
-            </div>
-            <div class="entry">
-                <div class="timer"></div>
-                <div class="word">
-                    <div class="letter">S</div>
-                    <div class="letter">U</div>
-                    <div class="letter">P</div>
-                    <div class="letter">E</div>
-                    <div class="letter">R</div>
-                    <div class="letter">C</div>
-                    <div class="letter">O</div>
-                    <div class="letter">M</div>
-                    <div class="letter">B</div>
-                    <div class="letter">O</div>
-                </div>
-                <div id="preview-counter-super" class="counter">
-                    <div class="letter">X</div>
-                    <div class="letter">2</div>
-                    <div class="letter">5</div>
-                </div>
-            </div>
-        </div>
-        <div id="preview-entry-mega" class="entry-wrapper mega">
-            <div class="entry-bg">
-                <div class="fire-stem"></div>
-                <div class="fire"></div>
-            </div>
-            <div class="entry">
-                <div class="timer"></div>
-                <div class="word">
-                    <div class="letter" style="--delay: 0.0s">M</div>
-                    <div class="letter" style="--delay: 0.1s">E</div>
-                    <div class="letter" style="--delay: 0.2s">G</div>
-                    <div class="letter" style="--delay: 0.3s">A</div>
-                    <div class="letter" style="--delay: 0.4s">C</div>
-                    <div class="letter" style="--delay: 0.5s">O</div>
-                    <div class="letter" style="--delay: 0.6s">M</div>
-                    <div class="letter" style="--delay: 0.7s">B</div>
-                    <div class="letter" style="--delay: 0.8s">O</div>
-                </div>
-                <div id="preview-counter-mega" class="counter">
-                    <div class="letter" style="animation-delay: 0.0s">X</div>
-                    <div class="letter" style="animation-delay: 0.1s">1</div>
-                    <div class="letter" style="animation-delay: 0.2s">0</div>
-                </div>
-            </div>
-        </div>
-        <div id="preview-entry-regular" class="entry-wrapper">
-            <div class="entry-bg">
-                <div class="fire-stem"></div>
-                <div class="fire"></div>
-            </div>
-            <div class="entry">
-                <div class="timer"></div>
-                <div class="word">
-                    <div class="letter">C</div>
-                    <div class="letter">O</div>
-                    <div class="letter">M</div>
-                    <div class="letter">B</div>
-                    <div class="letter">O</div>
-                </div>
-                <div id="preview-counter-regular" class="counter">
-                    <div class="letter">X</div>
-                    <div class="letter">2</div>
-                </div>
-            </div>
-        </div>
-    </div>
     <div id="notification">
     </div>
 </body>

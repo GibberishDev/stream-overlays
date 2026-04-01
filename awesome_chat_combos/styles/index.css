@@ -95,6 +95,7 @@ body {
 .counter {
     display: flex;
     flex-direction: row;
+    
 }
 
 
@@ -169,10 +170,10 @@ body {
     100% {opacity: 0;}
 }
 
-.entry-wrapper.super .letter{
+.super .letter{
     animation: shake linear .2s infinite, color-shift-fire 1s linear infinite forwards;
 }
-.entry-wrapper.mega .letter{
+.mega .letter{
     --delay: 0s;
     animation: wave ease-in-out .5s var(--delay) infinite, color-shift-rainbow 1s var(--delay) linear infinite forwards;
 }

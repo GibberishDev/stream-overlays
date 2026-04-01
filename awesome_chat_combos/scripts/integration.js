@@ -16,6 +16,7 @@ function integrationConnect() {
 			break
 		}
 		case INTEGRATION_TYPE.SB : {
+			if (typeof(getSetting) == 'function') sbPassword = getSetting("sb_password")
 			connectSB()
 			break
 		}
