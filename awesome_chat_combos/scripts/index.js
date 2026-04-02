@@ -127,56 +127,56 @@ document.addEventListener("settingchanged",(ev)=>{
 		}
 		case "position" : {
 			switch (registeredSettings.get("position").value) {
-				case 1 : {
+				case "1" : {
 					document.querySelectorAll(".combo-wrapper").forEach((el)=>{
 						el.className = ''
 						el.classList.add("combo-wrapper","pos-left")
 					})
 					break
 				}
-				case 2 : {
+				case "2" : {
 					document.querySelectorAll(".combo-wrapper").forEach((el)=>{
 						el.className = ''
 						el.classList.add("combo-wrapper","pos-top-left")
 					})
 					break
 				}
-				case 5 : {
+				case "5" : {
 					document.querySelectorAll(".combo-wrapper").forEach((el)=>{
 						el.className = ''
 						el.classList.add("combo-wrapper","pos-top-right")
 					})
 					break
 				}
-				case 3 : {
+				case "3" : {
 					document.querySelectorAll(".combo-wrapper").forEach((el)=>{
 						el.className = ''
 						el.classList.add("combo-wrapper","pos-bottom-right")
 					})
 					break
 				}
-				case 4 : {
+				case "4" : {
 					document.querySelectorAll(".combo-wrapper").forEach((el)=>{
 						el.className = ''
 						el.classList.add("combo-wrapper","pos-right")
 					})
 					break
 				}
-				case 8 : {
+				case "8" : {
 					document.querySelectorAll(".combo-wrapper").forEach((el)=>{
 						el.className = ''
 						el.classList.add("combo-wrapper","pos-top-center")
 					})
 					break
 				}
-				case 6 : {
+				case "6" : {
 					document.querySelectorAll(".combo-wrapper").forEach((el)=>{
 						el.className = ''
 						el.classList.add("combo-wrapper","pos-bottom-center")
 					})
 					break
 				}
-				case 7 : {
+				case "7" : {
 					document.querySelectorAll(".combo-wrapper").forEach((el)=>{
 						el.className = ''
 						el.classList.add("combo-wrapper","pos-center")
