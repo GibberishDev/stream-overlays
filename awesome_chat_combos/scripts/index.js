@@ -36,14 +36,14 @@ new SettingSelect("position", 0, {
 	7:"Center",
 	8:"Top center",
 },"Position anchor","Defines position of the anchor for combos.")
-new SettingBool("showtimer", false, "Display timer", "Decides whether to show or hide combo expiration timer")
+new SettingBool("showtimer", false, "<span style='display:flex;flex-direction:row'><span class='timer' style='margin-right:24px;--timer:block;animation: timer 2s 0s linear infinite forwards;'></span>Display timer</span>", "Decides whether to show or hide combo expiration timer")
 new SettingNumber("sizemult", 1.0, 0.1, null, 0.1, "Scale", "Controls scaling. where 0.1 is smallest at 10% of base size and 2 is bigger and 200% of base size")
 new SettingBool("displaywords", true, "Display words", "Decides whether to count text combos. Meant as emote only mode, unless you turned emotes off and... bruh ._.")
 new SettingBool("displayemotes", true, "Display emotes", "Decides whether to replace text with emotes")
 new SettingBool("ffz", true, "<img style='height:24px;width:36px;object-fit:contain;display:inline-block;position:relative;top:4px;margin-right:8px;' src='./assets/ffz.png'>Enable FFZ emotes", "Include FrankerFaceZ emotes in the set")
 new SettingBool("bttv", true, "<img style='height:24px;width:36px;object-fit:contain;display:inline-block;position:relative;top:4px;margin-right:8px;' src='./assets/bttv.png'>Enable BTTV emotes", "Include BetterTTV emotes in the set")
 new SettingBool("seventv", true, "<img style='height:24px;width:36px;object-fit:contain;display:inline-block;position:relative;top:4px;margin-right:8px;' src='./assets/7tv.svg'>Enable 7TV emotes", "Include 7TV emotes in the set")
-new SettingBool("showcounter", true, "Display counter <span style='font-family:boldpixels;color:var(--text-color);text-shadow:none;'>X1</span>", "Decides whether to show or hide combo counter")
+new SettingBool("showcounter", true, "<span style='padding-left:4px;font-size:24px;font-family:boldpixels;color:var(--text-color);text-shadow:none;'>X1</span> Display counter", "Decides whether to show or hide combo counter")
 new SettingBool("supercombobg", true, "<span style='height:24px;background-size:auto 24px;background:url(./assets/fire_stem.png);'>Display super combo </span><span style='white-space:nowrap;'><span style='height:24px;background-size:auto 24px;background:url(./assets/fire_stem.png);'>background</span><img style='position:relative;top:4px;' src='./assets/fire.gif'></span>", "Show or hide super combo flaming pipe background")
 new SettingNumber("lettersnumber", 20, -1, null, 1, "Visible letters", "Maximum amount of visible letters when displaying a word combo. -1 to display all")
 new SettingColor("textcolor", "#ffff00ff", "Text color", "Text color of regular combo")
@@ -53,7 +53,7 @@ new SettingBool("bots", true, "Ignore bot messages", "Ignore message if it was s
 new SettingBool("mentions", true, "Ignore mentions", "Ignore words that start with '@'")
 new SettingBool("samemessage", false, "Count spam combo", "Count same word in single message as separate repeats. Aka if someone types 'glorp glorp glorp' it will be counted 3 times")
 new SettingArray("botarray", ["nightbot","streamelements","sery_bot","wizebot","moobot","tangiabot","streamlabs"], "Bot names", "List of bot channels to ignore if 'Ignore bot messages' setting is on. Can be used as user blacklist")
-new SettingArray("blacklist", ["the", "a", "an", "in", "for", "from", "on", "to", "of", "or", "and", "we","you","i", "i'm", "im","she", "her","he","his","him","it","its","it's", "they", "them", "be", "is", "are", "am", "were", "was", "do",], "Common words filter", "List of words that will be ignored. Can be used as word blacklist")
+new SettingArray("blacklist", ["the", "a", "an", "in", "for", "from", "on", "to", "of", "or", "and", "we","you","i", "i'm", "im","she", "her","he","his","him","it","its","it's", "they", "them", "be", "is", "are", "am", "were", "was", "do",], "Common words filter", "List of words that will be ignored. Can be used as word blacklist. probably edit it in notepad and paste it here XD")
 
 new SettingSelect("integrationtype", 0,{
 	0:"None",
@@ -95,7 +95,8 @@ new LayoutCategory(new LayoutCondition("always"),[
 	new LayoutSetting(new LayoutCondition("always"), "showcounter", false, true),
 	new LayoutSetting(new LayoutCondition("always"), "lettersnumber", false, true),
 	new LayoutSetting(new LayoutCondition("always"), "textcolor", false, true),
-],"Display",true, false)
+]
+,"Display",true, false)
 
 new LayoutCategory(new LayoutCondition("always"),[
 	new LayoutSetting(new LayoutCondition("always"), "exclam", false, true),
