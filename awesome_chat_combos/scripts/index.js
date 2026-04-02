@@ -23,7 +23,7 @@ new SettingNumber("numbermega", 10, 0, null, 1,"<span style='display:flex;flex-d
 new SettingNumber("durationmega", 15000, 0, null, 100,"<span style='display:flex;flex-direction:row;'>Duration - <span class='mega' style='margin-left:10px;text-shadow:none;display:flex;flex-direction:row;'><div class='letter' style='--delay:0s'>M</div><div class='letter' style='--delay:0.1s'>E</div><div class='letter' style='--delay:0.2s'>G</div><div class='letter' style='--delay:0.3s'>A</div></span></span>", "Time in milliseconds until mega combo expires. Values below 2500 practically mean combo expires before twitch api sends information")
 new SettingNumber("numbersuper", 25, 0, null, 1,"<span style='display:flex;flex-direction:row;'>Required repetitions - <span class='super' style='margin-left:10px;text-shadow:none;display:flex;flex-direction:row;'><div class='letter'>S</div><div class='letter'>U</div><div class='letter'>P</div><div class='letter'>E</div><div class='letter'>R</div></span></span>", "Minimum number of repeats in chat to display super combo animation. 0 means disabled")
 new SettingNumber("durationsuper", 20000, 0, null, 100,"<span style='display:flex;flex-direction:row;'>Duration - <span class='super' style='margin-left:10px;text-shadow:none;display:flex;flex-direction:row;'><div class='letter'>S</div><div class='letter'>U</div><div class='letter'>P</div><div class='letter'>E</div><div class='letter'>R</div></span></span>", "Time in milliseconds until super combo expires. Values below 2500 practically mean combo expires before twitch api sends information")
-new SettingNumber("volume", 0, 0, 100, 1,"Sound effects volume", "Volume of sound effects. cool description")
+new SettingNumber("volume", 50, 0, 100, 1,"Sound effects volume", "Volume of sound effects. cool description")
 
 new SettingSelect("position", 0, {
 	0:"Bottom left",
@@ -67,7 +67,7 @@ new SettingString("sb_endpoint", "/", "Streamerbot websocket endpoint", "In case
 new SettingString("sb_password", "","Streamerbot websocket password", "In case you set up connection password enter it here", true)
 // #endregion
 // #region settings menu layout
-new LayoutText(new LayoutCondition("always"),"Awesome Chat Combos","Thank you for using ACC overlay. Made by GibbDev. Version 1.1",true)
+new LayoutText(new LayoutCondition("always"),"Awesome Chat Combos","Thank you for using ACC overlay. Made by GibbDev. Version 1.2",true)
 
 new LayoutCategory(new LayoutCondition("always"),[
 	new LayoutSetting(new LayoutCondition("always"), "channelList", true, true),

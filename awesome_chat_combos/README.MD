@@ -27,6 +27,13 @@ Avaliable interaction variables that overlay sends out:
 </details>
 </details>
 <details><summary><h1>Changelog</h1></summary>
+ <h2>1.2</h2>
+
+ - Bugfix for failed image loading (forgor ' in image src html onfail OOPS)
+ - Implemented sound system. check sounds folder in assets
+
+</details>
+<details><summary><h1>Changelog</h1></summary>
  <h2>1.1</h2>
 
  - Implemented bot integrations for following chat bot software:
