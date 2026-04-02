@@ -1,6 +1,6 @@
 let registeredSounds = new Map()
-var readySounds = 0
 var soundsNumber = 0
+var readyCounter = 0
 var soundQueue = {}
 
 class sfx {
@@ -10,17 +10,20 @@ class sfx {
         registeredSounds.set(this.id, this)
         this.path = path
         this.sound = new Audio(this.path)
-        this.sound.addEventListener("error",(ev)=>{console.error("Failed to register sound with id " + id + ". File not found: "+ path);this.error = true})
-        if (this.error) {
-            registeredSounds.delete(this.id)
+        this.sound.addEventListener("error",(ev)=>{
+            console.error("Failed to register sound with id " + id + ". File not found: "+ path);
+            registeredSounds.delete(id)
+            readyCounter++
+            checkReadySounds()
             return
-        }
+        })
         this.loaded = false
         this.sound.style.display='none'
         this.sound.addEventListener("loadeddata",(ev)=>{
             let event = new Event("soundloaded")
             event.id = this.id
             this.loaded = true
+            readyCounter++
             checkReadySounds()
             document.dispatchEvent(event)
         })
@@ -42,8 +45,6 @@ class sfx {
             },{once:true})
         }
     }
-    eventLoaded() {
-    }
 }
 
 function initSounds() {
@@ -51,11 +52,13 @@ function initSounds() {
 }
 
 function checkReadySounds() {
-    readySounds = 0
+    if (readyCounter < soundsNumber) return
+    let readySounds = 0
     for (let sound of registeredSounds.values()) {
+        console.log(sound)
         if (sound.loaded) readySounds++
     }
-    if (soundsNumber != 0 && readySounds == soundsNumber) {
+    if (soundsNumber != 0 && readySounds == registeredSounds.size) {
         if (typeof(moduleReady) == 'function') moduleReady("sounds")
     }
 }

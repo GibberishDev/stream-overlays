@@ -9,6 +9,10 @@ setModuleList([
 
 new sfx("super_appear","./assets/sounds/super.mp3")
 new sfx("super_timeout","./assets/sounds/super_timeout.mp3")
+new sfx("mega_appear","./assets/sounds/mega.mp3")
+new sfx("mega_timeout","./assets/sounds/mega_timeout.mp3")
+new sfx("regular_appear","./assets/sounds/regular.mp3")
+new sfx("regular_timeout","./assets/sounds/regular_timeout.mp3")
 initSounds()
 
 // #region settings
@@ -553,7 +557,7 @@ function updateEmoteHTML(emote) {
 		el.dataset.id = comboWords[emote].id
 		el.innerHTML = `<div class="entry-bg"><div class="fire-stem"></div><div class="fire"></div></div><div class="entry"><div class="timer"></div><div class="word"></div><div class="counter"></div></div>`
 		let url = getEmoteImageUrl(emote)
-		el.querySelector(".word").innerHTML = `<img class="letter" src="${url}" onerror="this.src=${url}">`
+		el.querySelector(".word").innerHTML = `<img class="letter" src="${url}" onerror="this.src='${url}'">`
 	}
 	switch (comboWords[emote].level) {
 		case 1 : {
