@@ -1,6 +1,22 @@
+const SETTING_TYPE = Object.freeze({
+    STRING : 0,
+    ARRAY : 1,
+    NUMBER : 2,
+    BOOL : 3,
+    COLOR : 4,
+    SELECT: 5
+})
+const LAYOUT_TYPE = Object.freeze({
+    EMPTY : 0,
+    BUTTON : 1,
+    CATEGORY : 2,
+    TEXT: 3,
+    SETTING: 4,
+})
 let registeredSettings = new Map()
-var settingsOpen = false
-var params = new URLSearchParams(window.location.search)
+let registeredLayoutObjects = []
+
+// #region common methods
 
 function initSettings() {
     retrieveSettings()
@@ -28,15 +44,20 @@ function saveSettings() {
     localStorage.settings = JSON.stringify(settingsObject)
 }
 
-const SETTING_TYPE = Object.freeze({
-    STRING : 0,
-    ARRAY : 1,
-    NUMBER : 2,
-    BOOL : 3,
-    COLOR : 4,
-    EMPTY: 5,
-})
+function getSetting(id) {
+    if (registeredSettings.get(id)) {
+        return registeredSettings.get(id).get()
+    }
+}
+function setSetting(id, value) {
+    if (registeredSettings.get(id)) {
+        return registeredSettings.get(id).set(value)
+    }
+}
 
+// #endregion
+
+// #region classes
 class Setting {
     constructor(id, type, defaultValue, name="Unnamed setting", description="No description provided.") {
         this.id = id,
@@ -56,15 +77,15 @@ class Setting {
         document.dispatchEvent(ev)
     }
 }
-
 class SettingArray extends Setting {
-    constructor (id, defaultValue, name="Unnamed setting", description="No description provided.") {
+    constructor (id, defaultValue, name="Unnamed setting", description="No description provided.", secure=false) {
         super (id, SETTING_TYPE.ARRAY, defaultValue, name, description)
     }
 }
 class SettingString extends Setting {
-    constructor (id, defaultValue, name="Unnamed setting", description="No description provided.") {
+    constructor (id, defaultValue, name="Unnamed setting", description="No description provided.", secure=false) {
         super (id, SETTING_TYPE.STRING, defaultValue, name, description)
+        this.secure = secure
     }
 }
 class SettingBool extends Setting {
@@ -84,6 +105,9 @@ class SettingNumber extends Setting {
         this.maxValue = maxValue
         this.step = step
     }
+    /**
+     * Checks if new value is valid and can be set. returns set value. if value cannot be converted to a valid number returns false
+     */
     set(value) {
         if (isNaN(parseInt(value))) {
             return false
@@ -98,160 +122,215 @@ class SettingNumber extends Setting {
         return value
     }
 }
-class SettingEmpty extends Setting {
-    constructor() {
-        super(uuidv4(),SETTING_TYPE.EMPTY,"","","")
+class SettingSelect extends Setting {
+    constructor(id, defaultValueId, options={}, name="Unnamed setting", description="No description provided.") {
+        super(id, SETTING_TYPE.SELECT,defaultValueId,name,description)
+        this.options=options
     }
 }
-// #region html menu gen
-const templateString = `
-<div class="setting-title"></div>
-<div class="setting-description"></div>
-<div class="setting-data">
-    <input class="input" value="" placeholder="">
-</div>
-`
-const templateToggle = `
-<div class="setting-title"></div>
-<div class="setting-description"></div>
-<div class="setting-data">
-    <input class="input" type="checkbox">
-    <div class="checkbox-vis"></div>
-</div>
-`
-const templateColor = `
-<div class="setting-title"></div>
-<div class="setting-description"></div>
-<div class="setting-data">
-    <div class="color-preview"></div>
-    <div class="slider hue" data-value="0">
-        <div class="grabber"></div>
-    </div>
-    <div class="slider sat" data-value="0">
-        <div class="grabber"></div>
-    </div>
-    <div class="slider val" data-value="0">
-        <div class="grabber"></div>
-    </div>
-</div>
-`
-function genSettingsMenu() {
-    let elementsList = []
-    if (document.querySelector("#content-preview")) document.querySelector("#content-preview").style.display = ""
-    document.querySelector("#open-settings").style.display = "none"
-    document.querySelector("#settings-wrapper").classList.remove("hidden")
-    document.querySelector("#settings-container").innerHTML = ""
-    for (let id of registeredSettings.keys()) {
-        let setting = registeredSettings.get(id)
-        switch (setting.type) {
-            case SETTING_TYPE.STRING : {
-                let el = document.createElement('div')
-                document.querySelector("#settings-container").appendChild(el)
-                el.classList.add("settings-item","string")
-                el.innerHTML = templateString
-                el.querySelector(".setting-title").textContent = setting.name
-                el.querySelector(".setting-description").textContent = setting.description
-                el.querySelector(".input").value = setting.get()
-                el.querySelector(".input").placeholder = "Enter string value here"
-                hookStringInput(el.querySelector(".input"), setting.id)
-                break
-            }
-            case SETTING_TYPE.ARRAY : {
-                let el = document.createElement('div')
-                document.querySelector("#settings-container").appendChild(el)
-                el.classList.add("settings-item","string")
-                el.innerHTML = templateString
-                el.querySelector(".setting-title").textContent = setting.name
-                el.querySelector(".setting-description").textContent = setting.description
-                el.querySelector(".input").value = Array.from(setting.get()).toString()
-                el.querySelector(".input").placeholder = "Enter comma separated values here"
-                hookArrayInput(el.querySelector(".input"), setting.id)
-                break
-            }
-            case SETTING_TYPE.NUMBER : {
-                let el = document.createElement('div')
-                document.querySelector("#settings-container").appendChild(el)
-                el.classList.add("settings-item","string")
-                el.innerHTML = templateString
-                el.querySelector(".setting-title").textContent = setting.name
-                el.querySelector(".setting-description").textContent = setting.description
-                el.querySelector(".input").type = "number"
-                if (setting.step) {
-                    el.querySelector(".input").step = setting.step
-                }
-                if (setting.minValue) {
-                    el.querySelector(".input").min = setting.minValue
-                }
-                if (setting.maxValue) {
-                    el.querySelector(".input").max = setting.maxValue
-                }
-                el.querySelector(".input").value = setting.get()
-                hookNumberInput(el.querySelector(".input"), setting.id)
-                break
-            }
-            case SETTING_TYPE.BOOL : {
-                let el = document.createElement('div')
-                document.querySelector("#settings-container").appendChild(el)
-                el.classList.add("settings-item","checkbox")
-                el.innerHTML = templateToggle
-                el.querySelector(".setting-title").textContent = setting.name
-                el.querySelector(".setting-description").textContent = setting.description
-                el.querySelector(".input").checked = setting.get()
-                hookBoolInput(el.querySelector(".input"), setting.id)
-                break
-            }
-            case SETTING_TYPE.COLOR : {
-                let el = document.createElement('div')
-                document.querySelector("#settings-container").appendChild(el)
-                el.classList.add("settings-item","color")
-                el.innerHTML = templateColor
-                el.querySelector(".setting-title").textContent = setting.name
-                el.querySelector(".setting-description").textContent = setting.description
-                setTimeout(()=>{hookColorInput(el.querySelector(".setting-data"), setting.id)},1)
-                break
-            }
-            case SETTING_TYPE.EMPTY : {
-                let el = document.createElement('div')
-                document.querySelector("#settings-container").appendChild(el)
-                el.classList.add("settings-item","empty")
+
+class LayoutCondition {
+    constructor(settingId, value = "") {
+        this.settingId = settingId
+        this.value = value
+    }
+    get() {
+        if (this.settingId == "always") return true
+        return (getSetting(this.settingId).toString() == this.value.toString())
+    }
+}
+
+class LayoutObject {
+    constructor(id, type, condition, isWide=false, isFadedWhenInactive=true) {
+        this.id = id
+        this.type = type
+        this.condition = condition
+        this.isWide = isWide
+        this.isFadedWhenInactive = isFadedWhenInactive
+        this.el = undefined
+        registeredLayoutObjects.push(this)
+    }
+    show() {
+        if (this.el) {
+            this.el.classList.remove("inactive","hidden")
+        }
+    }
+    hide() {
+        if (this.el) {
+            if (this.isFadedWhenInactive) {
+                this.el.classList.add("inactive")
+            } else {
+                this.el.classList.add("hidden")
             }
         }
     }
 }
-
-function hookStringInput(el, id) {
-    el.onblur = () => {
-        registeredSettings.get(id).set(el.value)
+class LayoutEmpty extends LayoutObject {
+    constructor(condition, isWide=false, isFadedWhenInactive=true) {
+        super(uuidv4(), LAYOUT_TYPE.EMPTY,condition, isWide, isFadedWhenInactive)
     }
 }
-function hookArrayInput(el, id) {
+class LayoutButton extends LayoutObject {
+    constructor(condition, callable, buttonText="", label="", description="", isWide=false, isFadedWhenInactive=true) {
+        super(uuidv4(), LAYOUT_TYPE.BUTTON,condition, isWide, isFadedWhenInactive)
+        this.callable = callable
+        this.buttonText = buttonText
+        this.label = label
+        this.description = description
+    }
+}
+class LayoutCategory extends LayoutObject {
+    constructor(condition, layoutObjects=[], label="", isFolded=true, isFadedWhenInactive=true) {
+        super(uuidv4(), LAYOUT_TYPE.CATEGORY,condition, true, isFadedWhenInactive)
+        this.layoutObjects = layoutObjects
+        this.label = label
+        this.isFolded = isFolded
+        for (let obj of layoutObjects) {
+            const index = registeredLayoutObjects.indexOf(obj)
+            if (index > -1) {
+                registeredLayoutObjects.splice(index, 1)
+            }
+        }
+    }
+    fold() {
+        if (this.el) {
+            this.el.classList.add("collapsed")
+        }
+        this.isFolded = true
+    }
+    unfold() {
+        if (this.el) {
+            this.el.classList.remove("collapsed")
+        }
+        this.isFolded = false
+    }
+    toggle() {
+        if (this.isFolded) {
+            this.unfold()
+        } else {
+            this.fold()
+        }
+    }
+} 
+class LayoutText extends LayoutObject {
+    constructor(condition, label="", description="", isWide=false, isFadedWhenInactive=true) {
+        super(uuidv4(), LAYOUT_TYPE.TEXT,condition, isWide, isFadedWhenInactive)
+        this.label = label
+        this.description = description
+    }
+}
+class LayoutSetting extends LayoutObject {
+    constructor(condition, settingId, isWide=false, isFadedWhenInactive=true) {
+        super(uuidv4(), LAYOUT_TYPE.SETTING, condition, isWide, isFadedWhenInactive)
+        this.settingId = settingId
+    }
+}
+// #endregion
+
+// #region settings layout generation 
+
+// #region templates
+const templateString=`<div class="setting-label"></div><div class="setting-description"></div><input type="text" placeholder="Input text here">`
+const templateCheckbox=`<div class="setting-label"></div><div class="setting-description"></div><div class="checkbox-container"><input type="checkbox"><div class="checkbox-vis"></div></div>`
+const templateColor=`<div class="setting-label"></div><div class="setting-description"></div><div class="color-container"><div class="color-preview"></div><div class="slider hue" data-value="0"><div class="grabber"></div></div><div class="slider sat" data-value="0"><div class="grabber"></div></div><div class="slider val" data-value="0"><div class="grabber"></div></div></div>`
+const templateSelect=`<div class="setting-label"></div><div class="setting-description"></div><div class="dropdown-input"><div class="dropdown-label"></div><div class="dropdown-vis"><</div></div>`
+// #endregion
+
+function genSettingElementData(id, wrapper) {
+    switch (registeredSettings.get(id).type) {
+        case SETTING_TYPE.STRING : {
+            wrapper.innerHTML = templateString
+            wrapper.classList.add("string")
+            wrapper.querySelector("input").value = getSetting(id)
+            if (registeredSettings.get(id).secure) wrapper.querySelector("input").style.setProperty("-webkit-text-security","disc")
+            hookStringInput(wrapper, id)
+            break
+        }
+        case SETTING_TYPE.ARRAY : {
+            wrapper.innerHTML = templateString
+            wrapper.classList.add("string")
+            wrapper.querySelector("input").value = getSetting(id)
+            if (registeredSettings.get(id).secure) wrapper.querySelector("input").style.setProperty("-webkit-text-security","disc")
+            hookArrayInput(wrapper, id)
+            break
+        }
+        case SETTING_TYPE.BOOL : {
+            wrapper.innerHTML = templateCheckbox
+            wrapper.classList.add("checkbox")
+            wrapper.querySelector("input").checked = getSetting(id)
+            hookBoolInput(wrapper, id)
+            break
+        }
+        case SETTING_TYPE.NUMBER : {
+            wrapper.innerHTML = templateString
+            wrapper.classList.add("string")
+            let setting = registeredSettings.get(id)
+            wrapper.querySelector("input").type = "number"
+            if (setting.step) {wrapper.querySelector("input").step = setting.step}
+            if (setting.minValue) {wrapper.querySelector("input").min = setting.minValue}
+            if (setting.maxValue) {wrapper.querySelector("input").max = setting.maxValue}
+            wrapper.querySelector("input").value = getSetting(id)
+            hookNumberInput(wrapper, id)
+            break
+        }
+        case SETTING_TYPE.COLOR : {
+            wrapper.innerHTML = templateColor
+            wrapper.classList.add("color")
+            setTimeout(()=>hookColorInput(wrapper, id),1)
+            break
+        }
+        case SETTING_TYPE.SELECT : {
+            wrapper.innerHTML = templateSelect
+            wrapper.classList.add("dropdown")
+            wrapper.querySelector(".dropdown-label").innerHTML = registeredSettings.get(id).options[getSetting(id)]
+            hookSelectInput(wrapper, id)
+            break
+        }
+    }
+    wrapper.querySelector(".setting-label").innerHTML = registeredSettings.get(id).name
+    wrapper.querySelector(".setting-description").innerHTML = registeredSettings.get(id).description
+}
+
+function hookStringInput(wrapper, id) {
+    let el = wrapper.querySelector("input")
+    el.onblur = () => {
+        registeredSettings.get(id).set(el.value)
+        populateSettingsDOM()
+    }
+}
+function hookArrayInput(wrapper, id) {
+    let el = wrapper.querySelector("input")
     el.onblur = () => {
         let values = []
         el.value.split(",").forEach((item)=>values.push(item.trim()))
         registeredSettings.get(id).set(values)
+        populateSettingsDOM()
     }
 }
-function hookNumberInput(el, id) {
+
+function hookBoolInput(wrapper, id) {
+    let el = wrapper.querySelector("input")
+    el.onchange = () => {
+        registeredSettings.get(id).set(el.checked)
+        populateSettingsDOM()
+    }
+}
+
+function hookNumberInput(wrapper, id) {
+    let el = wrapper.querySelector("input")
     el.onfocus = ()=>{
         el.dataset.lastValue = registeredSettings.get(id).get()
     }
     el.onblur = () => {
         if (registeredSettings.get(id).set(el.value) !== false) {
-            el.value = registeredSettings.get(id).get()
+            el.value = getSetting(id)
+            populateSettingsDOM()
         } else {
             el.value = el.dataset.lastValue
         }
     }
 }
-function hookBoolInput(el, id) {
-    el.onchange = ()=>{
-        if (el.checked) {
-            registeredSettings.get(id).set(true)
-        } else {
-            registeredSettings.get(id).set(false)
-        }
-    }
-}
+
 function hookColorInput(el, id) {
     let hue = el.querySelector(".hue")
     let sat = el.querySelector(".sat")
@@ -265,7 +344,7 @@ function hookColorInput(el, id) {
     val.style.setProperty("--sat",new HSV(color.h,color.s,100).toHex())
     hue.querySelector(".grabber").style.left = (hue.dataset.value*(hue.offsetWidth - 10)) + "px"
     sat.querySelector(".grabber").style.left = (sat.dataset.value*(sat.offsetWidth - 10)) + "px"
-    val.querySelector(".grabber").style.left = (val.dataset.value*(sat.offsetWidth - 10)) + "px"
+    val.querySelector(".grabber").style.left = (val.dataset.value*(val.offsetWidth - 10)) + "px"
     el.querySelector(".color-preview").style.setProperty("background",registeredSettings.get(id).get())
     hue.addEventListener("mousedown",(event)=>{
         handleColorDrag(event, hue, id)
@@ -310,100 +389,175 @@ function handleColorDrag(event,el,id) {
     el.parentNode.querySelector(".color-preview").style.setProperty("background",color.toHex())
     registeredSettings.get(id).set(color.toHex())
 }
-class HSV {
-    constructor(h,s,v) {
-        this.h = h
-        this.s = s
-        this.v = v
+
+function hookSelectInput(wrapper, id) {
+    let el = wrapper.querySelector(".dropdown-input")
+    el.addEventListener("click",(event)=>{summonDropdown(event, el, id)})
+}
+function summonDropdown(event, el, id) {
+    let dropdownWrapper = document.querySelector("#dropdown-wrapper")
+    dropdownWrapper.querySelector(".dropdown-list").innerHTML = ""
+    for (let optionId of Object.keys(registeredSettings.get(id).options)) {
+        let optionEl = document.createElement("div")
+        dropdownWrapper.querySelector(".dropdown-list").appendChild(optionEl)
+        optionEl.classList.add("dropdown-option")
+        optionEl.innerHTML = registeredSettings.get(id).options[optionId]
+        optionEl.addEventListener("click",()=>{
+            setSetting(id, optionId)
+            hideDropdown()
+            populateSettingsDOM()
+        })
     }
-    toHex = () => {
-        var sat = this.s / 100;
-        var val = this.v / 100;
+    document.addEventListener("mousedown",()=>{setTimeout(hideDropdown,100)},{once:true})
+    showDropdown(el)
+}
 
-        const c = val * sat;
-        const x = c * (1 - Math.abs((this.h / 60) % 2 - 1));
-        const m = val - c;
+function hideDropdown() {
+    document.querySelector("#dropdown-wrapper").style.display = "none"
+    document.querySelector("#dropdown-wrapper").querySelector(".dropdown-list").innerHTML = ""
+}
+function showDropdown(el) {
+    let rect = el.getBoundingClientRect()
+    let dropdownWrapper = document.querySelector("#dropdown-wrapper")
+    dropdownWrapper.style.left = rect.x + "px"
+    dropdownWrapper.style.top = (rect.y + rect.height) + "px"
+    dropdownWrapper.style.width = rect.width + "px"
+    dropdownWrapper.style.display = ""
+}
+//#endregion
 
-        let r = 0, g = 0, b = 0;
-
-        if (this.h >= 0 && this.h < 60) {
-            r = c; g = x; b = 0;
-        } else if (this.h < 120) {
-            r = x; g = c; b = 0;
-        } else if (this.h < 180) {
-            r = 0; g = c; b = x;
-        } else if (this.h < 240) {
-            r = 0; g = x; b = c;
-        } else if (this.h < 300) {
-            r = x; g = 0; b = c;
-        } else {
-            r = c; g = 0; b = x;
-        }
-
-        const toHex = n =>
-            Math.round((n + m) * 255)
-            .toString(16)
-            .padStart(2, "0");
-
-        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-    }
-
-    fromHex = (hex) => {
-        hex = hex.replace(/^#/, "");
-
-        const r = parseInt(hex.slice(0, 2), 16) / 255;
-        const g = parseInt(hex.slice(2, 4), 16) / 255;
-        const b = parseInt(hex.slice(4, 6), 16) / 255;
-
-        const max = Math.max(r, g, b);
-        const min = Math.min(r, g, b);
-        const delta = max - min;
-
-        let hue = 0;
-        let sat = 0;
-        let val = max;
-
-        if (delta !== 0) {
-            sat = delta / max;
-
-            switch (max) {
-            case r:
-                hue = ((g - b) / delta) % 6;
-                break;
-            case g:
-                hue = (b - r) / delta + 2;
-                break;
-            case b:
-                hue = (r - g) / delta + 4;
-                break;
+// #region html generation
+function populateSettingsDOM() {
+    let wrapper = document.querySelector("#settings-container")
+    wrapper.innerHTML = ""
+    let elements = getDOMElements(registeredLayoutObjects)
+    for (let el of elements) wrapper.appendChild(el)
+}
+function getDOMElements(layoutObjects) {
+    var elements = []
+    for (let layoutObj of layoutObjects) {
+        switch (layoutObj.type) {
+            case LAYOUT_TYPE.CATEGORY : {
+                elements.push(getCategoryElement(layoutObj))
+                break
             }
-
-            hue *= 60;
-            if (hue < 0) hue += 360;
+            case LAYOUT_TYPE.TEXT : {
+                elements.push(getTextElement(layoutObj))
+                break
+            }
+            case LAYOUT_TYPE.EMPTY : {
+                elements.push(getEmptyElement(layoutObj))
+                break
+            }
+            case LAYOUT_TYPE.SETTING : {
+                elements.push(getSettingElement(layoutObj))
+                break
+            }
         }
-        this.h = hue,
-        this.s = sat * 100,
-        this.v = val * 100
-        return this
     }
+    return elements
+}
+
+
+function getCategoryElement(layoutObj) {
+    let el = document.createElement("div")
+    layoutObj.el = el
+    el.classList.add("settings-category","wide")
+    if (!layoutObj.condition.get()) {
+        if (layoutObj.isFadedWhenInactive) {
+            el.classList.add("inactive")
+        } else {
+            el.classList.add("hidden")
+        }
+    }
+    if (layoutObj.isFolded) {
+        el.classList.add("collapsed")
+    }
+    el.innerHTML = `<div class="settings-category-label"></div><div class="settings-category-container"></div>`
+    el.querySelector(".settings-category-label").innerHTML = layoutObj.label
+    hookCategoryInput(el, layoutObj)
+    populateCategoryDOM(el, layoutObj)
+    return el
+}
+function hookCategoryInput(el, layoutObj) {
+    el.querySelector(".settings-category-label").addEventListener("click",()=>{layoutObj.toggle()})
+}
+function populateCategoryDOM(el, layoutObj) {
+    let container = el.querySelector(".settings-category-container")
+    for (let catElement of getDOMElements(layoutObj.layoutObjects)) {
+        container.appendChild(catElement)
+    }
+}
+
+function getTextElement(layoutObj) {
+    let el = document.createElement("div")
+    layoutObj.el = el
+    el.classList.add("setting")
+    if (!layoutObj.condition.get()) {
+        if (layoutObj.isFadedWhenInactive) {
+            el.classList.add("inactive")
+        } else {
+            el.classList.add("hidden")
+        }
+    }
+    if (layoutObj.isWide) el.classList.add("wide")
+    el.innerHTML = `<div class="setting-label"></div><div class="setting-description"></div>`
+    el.querySelector(".setting-label").innerHTML = layoutObj.label
+    el.querySelector(".setting-description").innerHTML = layoutObj.description
+    return el
+}
+
+function getEmptyElement(layoutObj) {
+    let el = document.createElement("div")
+    layoutObj.el = el
+    el.classList.add("setting","spacer")
+    if (!layoutObj.condition.get()) {
+        if (layoutObj.isFadedWhenInactive) {
+            el.classList.add("inactive")
+        } else {
+            el.classList.add("hidden")
+        }
+    }
+    if (layoutObj.isWide) el.classList.add("wide")
+    return el
+}
+
+function getSettingElement(layoutObj) {
+    let el = document.createElement("div")
+    layoutObj.el = el
+    el.classList.add("setting")
+    if (!layoutObj.condition.get()) {
+        if (layoutObj.isFadedWhenInactive) {
+            el.classList.add("inactive")
+        } else {
+            el.classList.add("hidden")
+        }
+    }
+    if (layoutObj.isWide) el.classList.add("wide")
+    genSettingElementData(layoutObj.settingId, el)
+    return el
+}
+// #endregion
+// #region html control
+
+function showSettingsMenu() {
+    document.querySelector("#open-settings").style.setProperty("display","none")
+    document.querySelector("#settings").style.setProperty("display","")
+    populateSettingsDOM()
+}
+
+function hideSettingsMenu() {
+    document.querySelector("#open-settings").style.setProperty("display","")
+    document.querySelector("#settings").style.setProperty("display","none")
 }
 function inputSaveSettings() {
+    hideSettingsMenu()
     saveSettings()
-    retrieveSettings()
-    document.querySelector("#settings-container").innerHTML = ""
-    document.querySelector("#settings-wrapper").classList.add("hidden")
-    if (document.querySelector("#content-preview")) document.querySelector("#content-preview").style.display = "none"
-    settingsOpen = false
-    document.querySelector("#open-settings").style.display = ""
     start()
 }
-function inputCancelSettigns() {
+function inputCancelSettings() {
+    hideSettingsMenu()
     retrieveSettings()
-    document.querySelector("#settings-container").innerHTML = ""
-    document.querySelector("#settings-wrapper").classList.add("hidden")
-    if (document.querySelector("#content-preview")) document.querySelector("#content-preview").style.display = "none"
-    settingsOpen = false
-    document.querySelector("#open-settings").style.display = ""
 }
 function inputResetSettings() {
     localStorage.clear()
@@ -411,7 +565,7 @@ function inputResetSettings() {
         registeredSettings.get(id).set(registeredSettings.get(id).defaultValue)
     }
     saveSettings()
-    genSettingsMenu()
+    populateSettingsDOM()
 }
 document.addEventListener("mousemove",()=>{triggerReflow(document.querySelector("#open-settings"))})
 // #endregion

@@ -1,27 +1,25 @@
+// #region settings declarations
 
-// #region settings init
-new SettingNumber("time_seconds", 900, 0, null, 1, "Time", "Time in seconds")
-new SettingNumber("scale_mult", 1.0, 0.1, null, 0.1, "Time", "Time in seconds")
-new SettingBool("show_seconds", true, "Display seconds", "Decides whether to show or hide seconds counter")
-new SettingBool("show_minutes", true, "Display minutes", "Decides whether to show or hide minutes counter")
-new SettingBool("show_hours", true, "Display hours", "Decides whether to show or hide hours counter")
-new SettingBool("show_days", true, "Display days", "Decides whether to show or hide days counter")
-new SettingBool("countup", true, "Count up", "decides whether timer will start counting up after time ran out")
-new SettingColor("color", "#ffffff", "Timer color", "Regular text color")
-new SettingColor("color_timeout", "#ff8d8d", "Timer timeout color", "Timeout text color. displayed when timer ran out")
-initSettings()
+// #region integration settings
+new SettingSelect("integrationtype", 0,{
+	0:"None",
+	1:"<img style='height:24px;width:36px;object-fit:contain;display:inline-block;position:relative;margin:0;margin-right:8px;' src='./assets/sb_logo.svg'>Streamer.Bot",
+	2:"<img style='height:24px;width:36px;object-fit:contain;display:inline-block;position:relative;margin:0;margin-right:8px;' src='./assets/miu_logo.ico'>MixItUp",
+	3:"<img style='height:24px;width:36px;object-fit:contain;display:inline-block;position:relative;margin:0;margin-right:8px;' src='./assets/fb_logo.png'>FireBot"
+},"Bot integration type", "Allows sending events to chat bots")
+new SettingString("sb_ip", "127.0.0.1","Streamerbot websocket ip", "In case you set up custom websocket server ip enter it here")
+new SettingNumber("sb_port", 8080, 0, 655353, 1,"Streamerbot websocket port", "Port number of streamer.bot websocket server. default is 8080")
+new SettingString("sb_endpoint", "/", "Streamerbot websocket endpoint", "In case you set up custom endpoint for websocket server enter it here")
+new SettingString("sb_password", "","Streamerbot websocket password", "In case you set up connection password enter it here", true)
+// #endregion
 // #endregion
 
-// #region utils
-function triggerReflow(element) {
-    element.style.animation = 'none';
-    void element.offsetHeight;
-    element.style.animation = null;
-}
-function uuidv4() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0, v = c == "x" ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-}
+// #region settings menu layout
+new LayoutCategory(new LayoutCondition("always"),[
+	new LayoutSetting(new LayoutCondition("always"), "integrationtype", true, true),
+	new LayoutSetting(new LayoutCondition("integrationtype",1), "sb_ip", false, true),
+	new LayoutSetting(new LayoutCondition("integrationtype",1), "sb_port", false, true),
+	new LayoutSetting(new LayoutCondition("integrationtype",1), "sb_endpoint", false, true),
+	new LayoutSetting(new LayoutCondition("integrationtype",1), "sb_password", false, true),
+],"Bot integration",true, false)
 // #endregion
