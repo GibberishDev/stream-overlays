@@ -6,6 +6,8 @@ const INTEGRATION_TYPE = Object.freeze({
 	MIU: 3, //MixItUp integration
 })
 var currentIntegration = INTEGRATION_TYPE.FB
+let registeredIntegrationEvents = new Map()
+let registeredIntegrationSignals = new Map()
 
 function connectIntegration() {
     switch (currentIntegration) {
@@ -13,6 +15,25 @@ function connectIntegration() {
             connectFB()
             break
         }
+    }
+}
+
+class IntegrationSignal {
+    constructor(id, name, group="", integrations=[]) {
+        this.id = id
+        this.integrations = integrations
+        if (this.integrations.toString() == "") {
+            this.integrations = [INTEGRATION_TYPE.FB,INTEGRATION_TYPE.SB,INTEGRATION_TYPE.MIU]
+        }
+        registeredIntegrationEvents.set(this.id, this)
+    }
+    dispatch(data={}) {
+        if (!this.integrations.includes(currentIntegration)) return
+    }
+}
+class IntegrationEvent {
+    constructor(id, handler) {
+
     }
 }
 
@@ -49,8 +70,12 @@ function setupWebsocket() {
 async function onFirebotMessage(event) {
     let data = await JSON.parse(event.data)
     if (data.type == "response" && data.name == "success") {
-        console.info("Messaging from Firebot established")
+        sendNotification("Messaging from Firebot established")
     }
+}
+
+async function dispatchEvent(id, data) {
+
 }
 
 // #endregion

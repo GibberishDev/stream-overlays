@@ -1,0 +1,51 @@
+@font-face {
+    font-family: JetBrains Mono;
+    src: url(../assets/JetBrainsMono-Regular.ttf);
+}
+:root {
+    --notifications-logs-display: none;
+}
+#notifications-wrapper {
+    display: flexbox;
+    flex-direction: column;
+    font-family: JetBrains Mono;
+    font-size: 16px;
+    position: absolute;
+    overflow: hidden;
+    width: 100dvw;
+    justify-content: left;
+    align-items: end;
+    transition: height 200ms;
+}
+.notification {
+    line-height: 24px;
+    color: green;
+    text-shadow: 0 0 .5rem black;
+    animation: notification 8s 0s ease-in forwards;
+    transform-origin: 0% 50%;
+    white-space: nowrap;
+}
+.log {
+    display: var(--notifications-logs-display);
+    color: white;
+}
+.warn {
+    color: yellow;
+}
+.error {
+    color: red;
+}
+@keyframes notification {
+    0% {
+        translate: -100dvw 0;
+    }
+    5% {
+        translate: 0 0;
+    }
+    95% {
+        translate: 0 0;
+    }
+    100% {
+        translate: -100dvw 0;
+    }
+}

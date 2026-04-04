@@ -167,12 +167,12 @@ class LayoutObject {
 }
 class LayoutEmpty extends LayoutObject {
     constructor(condition, isWide=false, isFadedWhenInactive=true) {
-        super(uuidv4(), LAYOUT_TYPE.EMPTY,condition, isWide, isFadedWhenInactive)
+        super(window.crypto.randomUUID() , LAYOUT_TYPE.EMPTY,condition, isWide, isFadedWhenInactive)
     }
 }
 class LayoutButton extends LayoutObject {
     constructor(condition, callable, buttonText="", label="", description="", isWide=false, isFadedWhenInactive=true) {
-        super(uuidv4(), LAYOUT_TYPE.BUTTON,condition, isWide, isFadedWhenInactive)
+        super(window.crypto.randomUUID() , LAYOUT_TYPE.BUTTON,condition, isWide, isFadedWhenInactive)
         this.callable = callable
         this.buttonText = buttonText
         this.label = label
@@ -181,7 +181,7 @@ class LayoutButton extends LayoutObject {
 }
 class LayoutCategory extends LayoutObject {
     constructor(condition, layoutObjects=[], label="", isFolded=true, isFadedWhenInactive=true) {
-        super(uuidv4(), LAYOUT_TYPE.CATEGORY,condition, true, isFadedWhenInactive)
+        super(window.crypto.randomUUID() , LAYOUT_TYPE.CATEGORY,condition, true, isFadedWhenInactive)
         this.layoutObjects = layoutObjects
         this.label = label
         this.isFolded = isFolded
@@ -214,14 +214,14 @@ class LayoutCategory extends LayoutObject {
 } 
 class LayoutText extends LayoutObject {
     constructor(condition, label="", description="", isWide=false, isFadedWhenInactive=true) {
-        super(uuidv4(), LAYOUT_TYPE.TEXT,condition, isWide, isFadedWhenInactive)
+        super(window.crypto.randomUUID() , LAYOUT_TYPE.TEXT,condition, isWide, isFadedWhenInactive)
         this.label = label
         this.description = description
     }
 }
 class LayoutSetting extends LayoutObject {
     constructor(condition, settingId, isWide=false, isFadedWhenInactive=true) {
-        super(uuidv4(), LAYOUT_TYPE.SETTING, condition, isWide, isFadedWhenInactive)
+        super(window.crypto.randomUUID() , LAYOUT_TYPE.SETTING, condition, isWide, isFadedWhenInactive)
         this.settingId = settingId
     }
 }
