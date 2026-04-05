@@ -50,6 +50,34 @@ var firebotWebsocket
 
 function connectFB() {
     setupWebsocket()
+    getFBEvents()
+}
+
+function getFBEvents() {
+    for (let event of registeredIntegrationEvents.keys) {
+        fetchFBEventId(registeredIntegrationEvents.get(event))
+    }
+}
+
+async function fetchFBEventId(event) {
+	let effectLists = await fetch(
+		"http://localhost:7472/api/v1/effects/preset",
+		{
+			method:"GET",
+			"headers":{"Content-Type": "application/json"}
+		}
+	).then((resp)=>resp.json()).catch((err)=>{
+		// eventIntegrationFail()
+		return
+	})
+	if (effectLists) {
+		for (let effectList of effectLists) {
+			if (effectList.name == event.name) {
+				event.firebot_id = effectList.id
+				break
+			}
+		}
+	}
 }
 
 function setupWebsocket() {
