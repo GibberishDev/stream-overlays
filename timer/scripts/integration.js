@@ -5,9 +5,9 @@ const INTEGRATION_TYPE = Object.freeze({
 	FB: 2, //FireBot integration
 	MIU: 3, //MixItUp integration
 })
-var currentIntegration = INTEGRATION_TYPE.FB
+var currentIntegration = 3
 let registeredIntegrationEvents = new Map()
-let registeredIntegrationSignals = new Map()
+let registeredIntegrationBotEvents = new Map()
 
 function connectIntegration() {
     switch (currentIntegration) {
@@ -15,25 +15,59 @@ function connectIntegration() {
             connectFB()
             break
         }
+        case INTEGRATION_TYPE.SB : {
+            connectSB()
+            break
+        }
+        case INTEGRATION_TYPE.MIU : {
+            connectMIU()
+            break
+        }
     }
 }
 
-class IntegrationSignal {
-    constructor(id, name, group="", integrations=[]) {
-        this.id = id
-        this.integrations = integrations
-        if (this.integrations.toString() == "") {
-            this.integrations = [INTEGRATION_TYPE.FB,INTEGRATION_TYPE.SB,INTEGRATION_TYPE.MIU]
+function eventIntegrationFail() {
+    var name = ""
+    if (currentIntegration==INTEGRATION_TYPE.SB){name="Streamer.Bot"}
+    else if (currentIntegration==INTEGRATION_TYPE.FB){name="Firebot"}
+    else if (currentIntegration==INTEGRATION_TYPE.MIU)name="MixItUp"
+    sendError(`Could not connect to ${name} integration`)
+}
+
+function dispatchEvent(id,data) {
+    switch (currentIntegration) {
+        case INTEGRATION_TYPE.FB : {
+            dispatchFBEvent(id, data)            
+            break
         }
+        case INTEGRATION_TYPE.SB : {
+            dispatchSBEvent(id, data)            
+            break
+        }
+        case INTEGRATION_TYPE.MIU : {
+            dispatchMIUEvent(id, data)            
+            break
+        }
+    }
+}
+
+class IntegrationOverlayEvent {
+    constructor(id, name, integrations=[INTEGRATION_TYPE.FB,INTEGRATION_TYPE.SB,INTEGRATION_TYPE.MIU]) {
+        this.id = id
+        this.name = name
+        this.integrations = integrations
         registeredIntegrationEvents.set(this.id, this)
     }
     dispatch(data={}) {
         if (!this.integrations.includes(currentIntegration)) return
     }
 }
-class IntegrationEvent {
-    constructor(id, handler) {
 
+class IntegrationBotEvent {
+    constructor(id, handler) {
+        this.id = id
+        this.handler = handler
+        registeredIntegrationBotEvents.set(this.id, this)
     }
 }
 
@@ -45,39 +79,55 @@ class IntegrationEvent {
 // #region Firebot
 
 var firebotWebsocket
+var firebotEventsTotal
+var firebotEventsFound
 
 // #region init
 
 function connectFB() {
+    firebotEventsTotal = 0
+    firebotEventsFound = 0
     setupWebsocket()
     getFBEvents()
 }
 
-function getFBEvents() {
-    for (let event of registeredIntegrationEvents.keys) {
-        fetchFBEventId(registeredIntegrationEvents.get(event))
-    }
-}
-
-async function fetchFBEventId(event) {
+async function getFBEvents() {
 	let effectLists = await fetch(
 		"http://localhost:7472/api/v1/effects/preset",
 		{
 			method:"GET",
 			"headers":{"Content-Type": "application/json"}
 		}
-	).then((resp)=>resp.json()).catch((err)=>{
-		// eventIntegrationFail()
-		return
-	})
+	).then((resp)=>resp.json()).catch(()=>{return})
 	if (effectLists) {
-		for (let effectList of effectLists) {
-			if (effectList.name == event.name) {
-				event.firebot_id = effectList.id
-				break
-			}
-		}
-	}
+        for (let eventId of registeredIntegrationEvents.keys()) {
+            let event = registeredIntegrationEvents.get(eventId) 
+            if (event.integrations.includes(INTEGRATION_TYPE.FB)){
+                firebotEventsTotal++
+                fetchFBEventId(effectLists, event)
+            }
+        }
+        if (firebotEventsTotal > 0) {
+            if (firebotEventsFound < firebotEventsTotal) {
+                sendWarn("Found firebot effect lists: " + firebotEventsFound.toString() + "/" + firebotEventsTotal.toString())
+            } else {
+                sendNotification("Found firebot effect lists: " + firebotEventsFound.toString() + "/" + firebotEventsTotal.toString())
+            }
+        }
+	} else {
+		eventIntegrationFail()
+    }
+}
+
+function fetchFBEventId(effectLists, event) {
+    for (let effectList of effectLists) {
+        if (effectList.name == event.name) {
+            event.firebot_id = effectList.id
+            firebotEventsFound++
+            sendLog("Found firebot event: " + event.id)
+            break
+        }
+    }
 }
 
 function setupWebsocket() {
@@ -85,30 +135,115 @@ function setupWebsocket() {
     firebotWebsocket.onopen = (ev)=>{
         firebotWebsocket.send(JSON.stringify({
             "type": "invoke",
-            "id": 0,
-            "name": "subscribe-events",
-            "data": []
+            "name": "subscribe-events"
         }))
     }
     firebotWebsocket.onmessage = (ev)=>{onFirebotMessage(ev)}
-    firebotWebsocket.onclose = (ev)=>{console.info("Firebot websocket closed: ",ev.reason)}
-    firebotWebsocket.onerror = (ev)=>{console.error("Firebot websocket ERROR: ",ev)}
+    firebotWebsocket.onerror = (ev)=>{
+        console.error("Firebot websocket ERROR: ",ev)
+        firebotWebsocket = undefined
+    }
 }
+
+// #endregion
+
+// #region handling
 
 async function onFirebotMessage(event) {
     let data = await JSON.parse(event.data)
     if (data.type == "response" && data.name == "success") {
         sendNotification("Messaging from Firebot established")
     }
+    let botEventId = data.name.replace("custom-event:","")
+    if (registeredIntegrationBotEvents.get(botEventId)) {
+        registeredIntegrationBotEvents.get(botEventId).handler(data.data)
+    }
 }
 
-async function dispatchEvent(id, data) {
-
+async function dispatchFBEvent(id, data) {
+    let ev = registeredIntegrationEvents.get(id)
+    data.eventId = ev.id
+    let dataString = JSON.stringify(data)
+    fetch(`http://localhost:7472/api/v1/effects/preset/${ev.firebot_id}/run`,{
+		"method": "POST",
+		"headers": {"Content-Type": "application/json"},
+		"body": JSON.stringify({"args":dataString})
+	})
 }
 
 // #endregion
 
 // #endregion
+
+// #region MixItUp
+
+// var mixitupWebsocket - //04.2026 - no websocket avaliable in MIU
+var mixitupEventsTotal
+var mixitupEventsFound
+// #region init
+function connectMIU() {
+    mixitupEventsTotal = 0
+    mixitupEventsFound = 0
+    getMIUEvents()
+}
+
+async function getMIUEvents() {
+	let effectLists = await fetch("http://localhost:8911/api/v2/commands").then((responce)=>responce.json()).then((obj)=>{return obj["Commands"]}).catch(()=>{return})
+    if (effectLists) {
+        for (let eventId of registeredIntegrationEvents.keys()) {
+            let event = registeredIntegrationEvents.get(eventId) 
+            if (event.integrations.includes(INTEGRATION_TYPE.MIU)){
+                mixitupEventsTotal++
+                fetchMIUEventId(effectLists, event)
+            }
+        }
+        if (mixitupEventsTotal > 0) {
+            if (mixitupEventsFound < mixitupEventsTotal) {
+                sendWarn("Found mixitup action groups: " + mixitupEventsFound.toString() + "/" + mixitupEventsTotal.toString())
+            } else {
+                sendNotification("Found mixitup action groups: " + mixitupEventsFound.toString() + "/" + mixitupEventsTotal.toString())
+            }
+        }
+
+    } else {
+        eventIntegrationFail()
+    }
+}
+
+function fetchMIUEventId(effectLists, event) {
+    for (let effectId in effectLists) {
+        if (effectLists[effectId].Type == "Action Group" && effectLists[effectId].Name == event.id) {
+            mixitupEventsFound++
+            event.mixitup_id = effectLists[effectId].ID
+        }
+    }
+}
+// #endregion
+
+
+// #region handling
+
+async function dispatchMIUEvent(id, data) {
+    let ev = registeredIntegrationEvents.get(id)
+    data.eventId = ev.id
+    let dataString = JSON.stringify(data)
+	fetch("http://localhost:8911/api/v2/commands/" + ev.mixitup_id,{
+		"method": "POST",
+		"headers": {
+			"Content-Type": "application/json"
+		},
+		"body": JSON.stringify({"SpecialIdentifiers":data})
+	})
+}
+
+// #endregion
+
+// #endregion
+
+
+// #region Streamer.Bot
+
+// #endregion 
 
 
 // #endregion bot specific

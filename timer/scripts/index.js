@@ -23,3 +23,17 @@ new LayoutCategory(new LayoutCondition("always"),[
 	new LayoutSetting(new LayoutCondition("integrationtype",1), "sb_password", false, true),
 ],"Bot integration",true, false)
 // #endregion
+
+// #region integration init
+
+new IntegrationOverlayEvent("timer_started","timer_started")
+
+new IntegrationBotEvent("add_time",addTime)
+
+connectIntegration()
+
+// #endregion
+
+function addTime(data) {
+	let timeToAdd = data.time
+}
