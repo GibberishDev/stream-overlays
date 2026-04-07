@@ -30,10 +30,14 @@ new IntegrationOverlayEvent("timer_started","timer_started")
 
 new IntegrationBotEvent("add_time",addTime)
 
-connectIntegration()
-
 // #endregion
+
+function start() {
+	connectIntegration()
+}
 
 function addTime(data) {
 	let timeToAdd = data.time
 }
+
+start()

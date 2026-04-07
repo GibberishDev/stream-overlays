@@ -553,7 +553,7 @@ function hideSettingsMenu() {
 function inputSaveSettings() {
     hideSettingsMenu()
     saveSettings()
-    start()
+    if (typeof(start) == 'function') start()
 }
 function inputCancelSettings() {
     hideSettingsMenu()

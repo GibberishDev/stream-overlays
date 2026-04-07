@@ -5,7 +5,7 @@ const INTEGRATION_TYPE = Object.freeze({
 	FB: 2, //FireBot integration
 	MIU: 3, //MixItUp integration
 })
-var currentIntegration = 3
+var currentIntegration = 1
 let registeredIntegrationEvents = new Map()
 let registeredIntegrationBotEvents = new Map()
 
@@ -175,6 +175,7 @@ async function dispatchFBEvent(id, data) {
 
 // #endregion
 
+
 // #region MixItUp
 
 // var mixitupWebsocket - //04.2026 - no websocket avaliable in MIU
@@ -243,6 +244,131 @@ async function dispatchMIUEvent(id, data) {
 
 // #region Streamer.Bot
 
+
+var streamerbotWebsocket = undefined
+var sbPort = "8080"
+var sbAwaitAuth = false
+var sbEventsTotal
+var sbEventsFound
+
+// #region init
+
+
+function connectSB() {
+    sbEventsFound = 0
+    sbEventsTotal = 0
+	let url = "ws://" + getSetting("sb_ip").toString() + ":" + getSetting("sb_port").toString() + getSetting("sb_endpoint").toString()
+	streamerbotWebsocket = new WebSocket(url)
+	streamerbotWebsocket.onmessage = onMessageSB
+    streamerbotWebsocket.onerror = (ev)=>{
+        console.error("Streamer.Bot websocket ERROR: ",ev)
+        streamerbotWebsocket = undefined
+        eventIntegrationFail()
+    }
+}
+
+async function sha256Base64(input) {
+	const encoder = new TextEncoder();
+	const data = encoder.encode(input);
+	const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+
+	// convert to base64
+	const bytes = new Uint8Array(hashBuffer);
+	let binary = "";
+	bytes.forEach(b => binary += String.fromCharCode(b));
+	return btoa(binary);
+}
+
+async function authenticate(data, password) {
+	const { salt, challenge } = data.authentication;
+
+	const secret = await sha256Base64(password + salt);
+	const authentication = await sha256Base64(secret + challenge);
+
+	const authRequest = {
+		id: "1",
+		request: "Authenticate",
+		authentication
+	};
+	sbAwaitAuth = true
+	streamerbotWebsocket.send(JSON.stringify(authRequest));
+	
+}
+
+function requestSBActions() {
+	streamerbotWebsocket.send(JSON.stringify({
+		"request": "GetActions",
+		"id": window.crypto.randomUUID()
+	}))
+}
+
+function getSBEvents(actions) {
+    for (let eventId of registeredIntegrationEvents.keys()) {
+        let ev = registeredIntegrationEvents.get(eventId)
+        if (ev.integrations.includes(INTEGRATION_TYPE.SB)) {
+            sbEventsTotal++
+            for (let action of actions) {
+                if (action.name == ev.id) {
+                    sbEventsFound++
+                    ev.streamerbot_id = action.id
+                }
+            }
+        }
+    }
+    
+    if (sbEventsTotal > 0) {
+        if (sbEventsFound < sbEventsTotal) {
+            sendWarn("Found Streamer.Bot actions: " + sbEventsFound.toString() + "/" + sbEventsTotal.toString())
+        } else {
+            sendNotification("Found Streamer.Bot actions: " + sbEventsFound.toString() + "/" + sbEventsTotal.toString())
+        }
+    }
+}
+
+// #endregion 
+// #region handling
+
+async function onMessageSB(message) {
+	const data = await JSON.parse(message.data)
+	if (data.request && data.request == "Hello") {
+		if (data.authentication) {
+			await authenticate(data, getSetting("sb_password"))
+			return
+		} else {
+            sendNotification("Connected to Streamer.Bot")
+			requestSBActions()
+			return
+		}
+	}
+	if (sbAwaitAuth && data.status && data.status == "ok") {
+		sbAwaitAuth = false
+        sendNotification("Connected to Streamer.Bot")
+		requestSBActions()
+		return
+	}
+    if (data.actions) {
+        getSBEvents(data.actions)
+        return
+    }
+    // TODO: if there is a way to message back from streamer.bot i will implmnt it. Fuck this piece of shit software
+}
+
+function dispatchSBEvent(id, data) {
+	let action = registeredIntegrationEvents.get(id)
+    data.eventId = id
+	let obj = JSON.stringify({
+		"id": window.crypto.randomUUID(),
+		"request": "DoAction",
+		"action": {
+            "id": action.streamerbot_id,
+            "name": action.id
+        },
+		"args":data
+	})
+	streamerbotWebsocket.send(obj)
+}
+
+// #endregion 
 // #endregion 
 
 
