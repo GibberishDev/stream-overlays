@@ -1,4 +1,5 @@
 var notificationsWrapper = undefined
+var log = []
 
 function setup(){
     notificationsWrapper = document.querySelector("#notifications-wrapper")
@@ -8,7 +9,7 @@ function setup(){
         notificationsWrapper = el
         el.id = "notifications-wrapper"
     }
-    sendLog(`Notifications ready`)
+    sendLog(`Notifications module ready`)
 }
 
 function sendNotification(notificationBody) {
@@ -17,6 +18,7 @@ function sendNotification(notificationBody) {
     el.innerHTML = "<div style='display:flex;flex-direction:row;'><span style='width:36px;text-align:center;'>ⓘ</span>" + notificationBody + "</div>"
     notificationsWrapper.appendChild(el)
     setTimeout(()=>el.remove(),8000)
+    logMessage(notificationBody,"notif")
 }
 function sendError(notificationBody) {
     let el = document.createElement("div")
@@ -24,6 +26,7 @@ function sendError(notificationBody) {
     el.innerHTML = "<div style='display:flex;flex-direction:row;'><span style='width:36px;text-align:center;'>⊘</span>" + notificationBody + "</div>"
     notificationsWrapper.appendChild(el)
     setTimeout(()=>el.remove(),8000)
+    logMessage(notificationBody,"err")
 }
 function sendWarn(notificationBody) {
     let el = document.createElement("div")
@@ -31,6 +34,7 @@ function sendWarn(notificationBody) {
     el.innerHTML = "<div style='display:flex;flex-direction:row;'><span style='width:36px;text-align:center;'>⚠︎</span>" + notificationBody + "</div>"
     notificationsWrapper.appendChild(el)
     setTimeout(()=>el.remove(),8000)
+    logMessage(notificationBody,"warn")
 }
 function sendLog(notificationBody) {
     let el = document.createElement("div")
@@ -38,6 +42,18 @@ function sendLog(notificationBody) {
     el.innerHTML = "<div style='display:flex;flex-direction:row;'><span style='width:36px;text-align:center;'>⚙</span>" + notificationBody + "</div>"
     notificationsWrapper.appendChild(el)
     setTimeout(()=>el.remove(),8000)
+    logMessage(notificationBody,"log")
 }
+
+function logMessage(message, type) {
+    message = sanitizeHTML(message)
+    let timestamp = new Date()
+    log.push({
+        "timestamp":timestamp,
+        "message":message,
+        "logType":type
+    })
+}
+
 
 setup()

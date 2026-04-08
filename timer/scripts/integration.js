@@ -5,7 +5,7 @@ const INTEGRATION_TYPE = Object.freeze({
 	FB: 2, //FireBot integration
 	MIU: 3, //MixItUp integration
 })
-var currentIntegration = 1
+var currentIntegration = INTEGRATION_TYPE.FB
 let registeredIntegrationEvents = new Map()
 let registeredIntegrationBotEvents = new Map()
 
@@ -104,7 +104,9 @@ async function getFBEvents() {
             let event = registeredIntegrationEvents.get(eventId) 
             if (event.integrations.includes(INTEGRATION_TYPE.FB)){
                 firebotEventsTotal++
-                fetchFBEventId(effectLists, event)
+                if (!fetchFBEventId(effectLists, event)) {
+                    sendLog("Firebot event not found: " + event.id)
+                }
             }
         }
         if (firebotEventsTotal > 0) {
@@ -124,10 +126,12 @@ function fetchFBEventId(effectLists, event) {
         if (effectList.name == event.name) {
             event.firebot_id = effectList.id
             firebotEventsFound++
+            eventFound = true
             sendLog("Found firebot event: " + event.id)
-            break
+            return true
         }
     }
+    return false
 }
 
 function setupWebsocket() {
@@ -350,7 +354,7 @@ async function onMessageSB(message) {
         getSBEvents(data.actions)
         return
     }
-    // TODO: if there is a way to message back from streamer.bot i will implmnt it. Fuck this piece of shit software
+    // TODO: if there is a way to message back from streamer.bot i will implement it. Fuck this piece of shit software
 }
 
 function dispatchSBEvent(id, data) {

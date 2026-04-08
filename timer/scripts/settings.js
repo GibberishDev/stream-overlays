@@ -12,6 +12,7 @@ const LAYOUT_TYPE = Object.freeze({
     CATEGORY : 2,
     TEXT: 3,
     SETTING: 4,
+    LOG: 5,
 })
 let registeredSettings = new Map()
 let registeredLayoutObjects = []
@@ -20,6 +21,7 @@ let registeredLayoutObjects = []
 
 function initSettings() {
     retrieveSettings()
+    if (typeof(sendLog)) sendLog("Initialised " + registeredSettings.size + " settings")
     if (typeof(moduleReady)) moduleReady("settings")
 }
 
@@ -223,6 +225,11 @@ class LayoutSetting extends LayoutObject {
     constructor(condition, settingId, isWide=false, isFadedWhenInactive=true) {
         super(window.crypto.randomUUID() , LAYOUT_TYPE.SETTING, condition, isWide, isFadedWhenInactive)
         this.settingId = settingId
+    }
+}
+class LayoutLog extends LayoutObject {
+    constructor(condition,isWide,isFadedWhenInactive=true) {
+        super(window.crypto.randomUUID(), LAYOUT_TYPE.LOG, condition, isWide, isFadedWhenInactive)
     }
 }
 // #endregion
@@ -453,6 +460,14 @@ function getDOMElements(layoutObjects) {
                 elements.push(getSettingElement(layoutObj))
                 break
             }
+            case LAYOUT_TYPE.LOG : {
+                elements.push(getLogElement(layoutObj))
+                break
+            }
+            case LAYOUT_TYPE.BUTTON : {
+                elements.push(getButtonElement(layoutObj))
+                break
+            }
         }
     }
     return elements
@@ -536,6 +551,36 @@ function getSettingElement(layoutObj) {
     if (layoutObj.isWide) el.classList.add("wide")
     genSettingElementData(layoutObj.settingId, el)
     return el
+}
+
+function getLogElement(layoutObj) {
+    let el = document.createElement("div")
+    layoutObj.el = el
+    el.classList.add("setting","log")
+    if (!layoutObj.condition.get()) {
+        if (layoutObj.isFadedWhenInactive) {
+            el.classList.add("inactive")
+        } else {
+            el.classList.add("hidden")
+        }
+    }
+    if (layoutObj.isWide) el.classList.add("wide")
+    el.innerHTML = `<div class="setting-label">Log</div><div class="setting-description"></div>`
+    for (let logItem of log) {
+        let time = padZero(logItem.timestamp.getHours()) + ":" + padZero(logItem.timestamp.getMinutes()) + ":" + padZero(logItem.timestamp.getSeconds())
+        el.querySelector(".setting-description").innerHTML += `
+        <div class='log-entry'>
+            <span class='timestamp'>${time}</span>
+            <span class='message log-${logItem.logType}'>${logItem.message}</span>
+        </div>
+        `
+    }
+    return el
+}
+function padZero(number) {
+  // Convert to string and check length
+  const str = number.toString();
+  return str.length === 1 ? '0' + str : str;
 }
 // #endregion
 // #region html control

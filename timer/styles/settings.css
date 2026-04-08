@@ -514,3 +514,32 @@ body {
     from {opacity: 1;}
     to {opacity: 0;}
 }
+#fps {
+    color: yellow;
+    font-family: JetBrains Mono;
+    position: absolute;
+}
+
+.setting.log {
+    display: flex;
+    flex-direction: column;
+}
+.setting.log .setting-description {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    max-height: 480px;
+    overflow-y: auto;
+}
+.log-entry {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    opacity: .5;
+}
+.log-entry:hover {
+    opacity: 1;
+}
+.message.log-notif {color: green;text-shadow:0 0 5px green}
+.message.log-warn {color: yellow;text-shadow:0 0 5px yellow}
+.message.log-err {color: red;text-shadow:0 0 5px red}

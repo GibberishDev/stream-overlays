@@ -62,4 +62,33 @@ class HSV {
         return this
     }
 }
+
+var fps = document.getElementById("fps")
+var startTime = Date.now()
+var frame = 0
+
+function tick() {
+  var time = Date.now()
+  frame++
+  if (time - startTime > 100) {
+      fps.innerHTML = Math.floor(frame / ((time - startTime) / 1000)) + " FPS"
+      startTime = time
+      frame = 0
+	}
+  window.requestAnimationFrame(tick)
+}
+tick()
+
+function sanitizeHTML(html) {
+    html = html.replace(/<style([\s\S]*?)<\/style>/gi, '')
+    html = html.replace(/<script([\s\S]*?)<\/script>/gi, '')
+    html = html.replace(/<\/div>/ig, '\n')
+    html = html.replace(/<\/li>/ig, '\n')
+    html = html.replace(/<li>/ig, '  *  ')
+    html = html.replace(/<\/ul>/ig, '\n')
+    html = html.replace(/<\/p>/ig, '\n')
+    html = html.replace(/<br\s*[\/]?>/gi, "\n")
+    html = html.replace(/<[^>]+>/ig, '')
+    return html
+}
 // #endregion

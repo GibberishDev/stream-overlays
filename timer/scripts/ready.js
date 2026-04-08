@@ -7,15 +7,18 @@ function moduleReady(moduleID) {
     ev.module = moduleID
     document.dispatchEvent(ev)
     if (moduleStates.get(moduleID) == undefined) {
-        console.warn("-/" + moduleStates.size + " - undeclared module ready: " + moduleID)
+        console.warn(`${readyCount}/${moduleStates.size} - undeclared module ready: ${moduleID}`)
+        sendLog(`[${readyCount}/${moduleStates.size}] - undeclared module ready: ${moduleID}`)
         return
     } else if (moduleStates.get(moduleID)){
-        console.warn(readyCount +  "/" + moduleStates.size + " - repeated module ready: " + moduleID)
+        console.warn(`${readyCount}/${moduleStates.size} - repeated module ready: ${moduleID}`)
+        sendLog(`[${readyCount}/${moduleStates.size}] - repeated module ready: ${moduleID}`)
         return
     }
     moduleStates.set(moduleID, true)
     readyCount++
     console.info(readyCount +  "/" + moduleStates.size + " - module ready: " + moduleID)
+    sendLog(`[${readyCount}/${moduleStates.size}] - module ready: ${moduleID}`)
     checkModules()
 }
 
@@ -33,6 +36,7 @@ function ready() {
     let ev = new Event("allmodulesready")
     document.dispatchEvent(ev)
     console.info("ALL - all modules ready")
+    sendLog("[ALL] - all modules ready")
 }
 
 function reload() {
