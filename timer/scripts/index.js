@@ -102,12 +102,6 @@ new IntegrationBotEvent("add_time",addTime)
 function start() {
 	connectIntegration()
 }
-
-function logSpam() {
-	sendLog("AAAAAA")
-	setTimeout(logSpam,3000)
-}
-
 function addTime(data) {
 	let timeToAdd = data.time
 }
